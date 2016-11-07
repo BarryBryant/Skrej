@@ -1,7 +1,6 @@
 package com.willowtreeapps.skrej;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -14,13 +13,13 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.calendar.CalendarScopes;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.willowtreeapps.skrej.ConferenceRoomActivity.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.ConferenceRoomActivity.REQUEST_PERMISSION_GET_ACCOUNTS;
+import static android.app.Activity.RESULT_OK;
 
 /**
  * Created by barrybryant on 11/7/16.
@@ -42,6 +41,7 @@ public class CalendarApi {
     private GoogleAccountCredential mCredential;
     private Context context;
     private SharedPreferences preferences;
+    private ArrayList<CalendarListener> listeners  = new ArrayList<>();
 
     public CalendarApi(Context context, SharedPreferences preferences) {
         this.preferences = preferences;
@@ -58,7 +58,7 @@ public class CalendarApi {
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    private void getResultsFromApi() {
+    public void getResultsFromApi() {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -66,7 +66,37 @@ public class CalendarApi {
         } else if (! isDeviceOnline()) {
             Log.d(TAG, "No network available");
         } else {
-            new CalendarRequestTask(mCredential).execute();
+            new CalendarRequestTask(mCredential, listeners).execute();
+        }
+    }
+
+
+    public void onActivityResult(int requestCode, int resultCode, String name) {
+        switch(requestCode) {
+            case CalendarApi.REQUEST_GOOGLE_PLAY_SERVICES:
+                if (resultCode != RESULT_OK) {
+                    Log.d(TAG,
+                            "This app requires Google Play Services. Please install " +
+                                    "Google Play Services on your device and relaunch this app.");
+                } else {
+                    getResultsFromApi();
+                }
+                break;
+            case REQUEST_ACCOUNT_PICKER:
+                if (resultCode == RESULT_OK && name != null) {
+                    SharedPreferences.Editor editor = preferences.edit();
+                    editor.putString(PREF_ACCOUNT_NAME, name);
+                    editor.apply();
+                    mCredential.setSelectedAccountName(name);
+                    getResultsFromApi();
+
+                }
+                break;
+            case REQUEST_AUTHORIZATION:
+                if (resultCode == RESULT_OK) {
+                    getResultsFromApi();
+                }
+                break;
         }
     }
 
@@ -89,15 +119,15 @@ public class CalendarApi {
                 mCredential.setSelectedAccountName(accountName);
                 getResultsFromApi();
             } else {
-                // Start a dialog from which the user can choose an account
-//                startActivityForResult(
-//                        mCredential.newChooseAccountIntent(),
-//                        REQUEST_ACCOUNT_PICKER);
+                for (CalendarListener listener : listeners) {
+                    listener.showChooseAccountActivity(mCredential.newChooseAccountIntent(),
+                            REQUEST_ACCOUNT_PICKER);
+                }
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
-                    this,
+                    context,
                     "This app needs to access your Google account (via Contacts).",
                     REQUEST_PERMISSION_GET_ACCOUNTS,
                     Manifest.permission.GET_ACCOUNTS);
@@ -127,7 +157,9 @@ public class CalendarApi {
         final int connectionStatusCode =
                 apiAvailability.isGooglePlayServicesAvailable(context);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
-//            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
+            for (CalendarListener listener : listeners) {
+                listener.onGooglePlayServicesError(connectionStatusCode);
+            }
         }
     }
 
@@ -140,6 +172,15 @@ public class CalendarApi {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
+    }
+
+    public void register(CalendarListener listener) {
+        if (listeners.contains(listener)) throw new IllegalStateException("Listener is already registered.");
+        listeners.add(listener);
+    }
+
+    public void unregister(CalendarListener listener) {
+        listeners.remove(listener);
     }
 
 
