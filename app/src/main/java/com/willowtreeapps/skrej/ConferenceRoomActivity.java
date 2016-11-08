@@ -3,10 +3,14 @@ package com.willowtreeapps.skrej;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -16,13 +20,14 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.willowtreeapps.skrej.CalendarApi.REQUEST_GOOGLE_PLAY_SERVICES;
 
-public class ConferenceRoomActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConferenceView {
+public class ConferenceRoomActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConferenceView, View.OnClickListener {
 
     ProgressDialog mProgress;
 
     private static final String TAG = "ConferenceRoomActivity";
 
     private ConferencePresenter presenter;
+    private Button useButton;
 
     /**
      * Create the main activity.
@@ -31,19 +36,23 @@ public class ConferenceRoomActivity extends AppCompatActivity implements EasyPer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_conference_room);
         presenter = new ConferencePresenterImpl(new CalendarApi(this, getPreferences(MODE_PRIVATE)));
-        mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Calling Google Calendar API ...");
+        useButton = (Button) findViewById(R.id.useRoomButton);
+        useButton.setOnClickListener(this);
     }
 
     @Override
     protected void onResume() {
+        Log.d(TAG, "onResume");
         super.onResume();
         presenter.bindView(this);
     }
 
     @Override
     protected void onPause() {
+        Log.d(TAG, "onPause");
+        super.onPause();
         presenter.unbindView();
     }
 
@@ -154,5 +163,15 @@ public class ConferenceRoomActivity extends AppCompatActivity implements EasyPer
     @Override
     public void disableScheduleButton() {
 
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case R.id.useRoomButton:
+                presenter.loadCalendar();
+            default:
+                break;
+        }
     }
 }

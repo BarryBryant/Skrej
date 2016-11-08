@@ -14,7 +14,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".ConferenceRoomActivity"
-            android:label="Google Calendar API Android Quickstart" >
+            android:label="Skrej" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

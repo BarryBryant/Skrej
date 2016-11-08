@@ -1,9 +1,11 @@
 package com.willowtreeapps.skrej;
 
 import android.content.Intent;
+import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
 
 import java.util.List;
@@ -33,7 +35,6 @@ public class ConferencePresenterImpl implements ConferencePresenter, CalendarLis
     @Override
     public void unbindView() {
         this.view = null;
-        api.unregister(this);
     }
 
     @Override
@@ -47,12 +48,36 @@ public class ConferencePresenterImpl implements ConferencePresenter, CalendarLis
     }
 
     @Override
-    public void onCalendarLoadFinished(List<Event> events) {
+    public void loadCalendar() {
+        view.showSpinner();
+        api.getResultsFromApi();
+    }
 
+    @Override
+    public void onCalendarLoadFinished(List<Event> events) {
+        view.hideSpinner();
+        for (Event event : events) {
+            DateTime start = event.getStart().getDateTime();
+            DateTime end = event.getEnd().getDateTime();
+            if (start == null) {
+                // All-day events don't have start times, so just use
+                // the start date.
+                start = event.getStart().getDate();
+            }
+            if (end == null) {
+                // All-day events don't have start times, so just use
+                // the start date.
+                end = event.getEnd().getDate();
+            }
+            Log.d(TAG,
+                    String.format("%s (%s)(%s)", event.getSummary(), start, end));
+        }
     }
 
     @Override
     public void onError(Throwable error) {
+        view.hideSpinner();
+        Log.d(TAG, error.getMessage());
             if (error instanceof GooglePlayServicesAvailabilityIOException) {
                 view.showPlayServicesErrorDialog(
                         ((GooglePlayServicesAvailabilityIOException) error)

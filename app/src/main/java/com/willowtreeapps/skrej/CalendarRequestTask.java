@@ -5,6 +5,7 @@ package com.willowtreeapps.skrej;
  */
 
 import android.os.AsyncTask;
+import android.util.Log;
 
 import com.google.api.client.extensions.android.http.AndroidHttp;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
@@ -47,6 +48,7 @@ public class CalendarRequestTask extends AsyncTask<Void, Void, List<Event>> {
     @Override
     protected List<Event> doInBackground(Void... params) {
         try {
+            Log.d(TAG, "trying to get the data");
             return getDataFromApi();
         } catch (Exception e) {
             mLastError = e;

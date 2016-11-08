@@ -9,4 +9,5 @@ public interface ConferencePresenter {
     void unbindView();
     void onActivityResult(int request, int response, String name);
     void onClickSchedule();
+    void loadCalendar();
 }

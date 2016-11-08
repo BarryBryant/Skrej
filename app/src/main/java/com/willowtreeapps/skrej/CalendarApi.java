@@ -60,12 +60,15 @@ public class CalendarApi {
      */
     public void getResultsFromApi() {
         if (! isGooglePlayServicesAvailable()) {
+            Log.d(TAG, "acquirePlaservices");
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
+            Log.d(TAG, "choose account");
             chooseAccount();
         } else if (! isDeviceOnline()) {
             Log.d(TAG, "No network available");
         } else {
+            Log.d(TAG, "fire off task");
             new CalendarRequestTask(mCredential, listeners).execute();
         }
     }
