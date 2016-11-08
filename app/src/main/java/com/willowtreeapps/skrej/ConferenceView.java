@@ -16,4 +16,6 @@ public interface ConferenceView {
     void updateDate();
     void enableScheduleButton();
     void disableScheduleButton();
+    void onVerifiedValidCredentials();
+    void showUserPermissionsDialog();
 }

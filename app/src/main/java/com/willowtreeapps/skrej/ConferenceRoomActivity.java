@@ -1,9 +1,9 @@
 package com.willowtreeapps.skrej;
 
+import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
-import android.app.ProgressDialog;
-import android.content.DialogInterface;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -18,15 +18,14 @@ import java.util.List;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.willowtreeapps.skrej.CalendarApi.REQUEST_GOOGLE_PLAY_SERVICES;
+import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 public class ConferenceRoomActivity extends AppCompatActivity implements EasyPermissions.PermissionCallbacks, ConferenceView, View.OnClickListener {
 
-    ProgressDialog mProgress;
-
     private static final String TAG = "ConferenceRoomActivity";
+    private static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
 
-    private ConferencePresenter presenter;
+    private ConferencePresenterImpl presenter;
     private Button useButton;
 
     /**
@@ -37,7 +36,11 @@ public class ConferenceRoomActivity extends AppCompatActivity implements EasyPer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conference_room);
-        presenter = new ConferencePresenterImpl(new CalendarApi(this, getPreferences(MODE_PRIVATE)));
+        presenter = (ConferencePresenterImpl) getLastCustomNonConfigurationInstance();
+        if (presenter == null) {
+            Log.d(TAG, "New Presenter");
+            presenter = new ConferencePresenterImpl(this, new CredentialHelper(this, getPreferences(Context.MODE_PRIVATE)));
+        }
         useButton = (Button) findViewById(R.id.useRoomButton);
         useButton.setOnClickListener(this);
     }
@@ -69,8 +72,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements EasyPer
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-        presenter.onActivityResult(requestCode, resultCode, name);
+        presenter.onActivityResult(requestCode, resultCode, data);
     }
 
     /**
@@ -166,6 +168,20 @@ public class ConferenceRoomActivity extends AppCompatActivity implements EasyPer
     }
 
     @Override
+    public void onVerifiedValidCredentials() {
+        presenter.initializeLoader(this);
+    }
+
+    @Override
+    public void showUserPermissionsDialog() {
+        EasyPermissions.requestPermissions(
+                this,
+                "This app needs to access your Google account (via Contacts).",
+                REQUEST_PERMISSION_GET_ACCOUNTS,
+                Manifest.permission.GET_ACCOUNTS);
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.useRoomButton:
@@ -174,4 +190,10 @@ public class ConferenceRoomActivity extends AppCompatActivity implements EasyPer
                 break;
         }
     }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return presenter;
+    }
+
 }
