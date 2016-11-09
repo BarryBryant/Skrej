@@ -228,12 +228,12 @@ public class LoginActivity extends AppCompatActivity
         switch (view.getId()) {
             case CACTUAR:
                 Intent cactuarIntent = new Intent(this, ConferenceRoomActivity.class);
-                cactuarIntent.putExtra("ROOM_KEY", "Cactuar");
+                cactuarIntent.putExtra(getString(R.string.room_id_bundle_key), "Cactuar");
                 startActivity(cactuarIntent);
                 break;
             case DEKU:
                 Intent dekuIntent = new Intent(this, ConferenceRoomActivity.class);
-                dekuIntent.putExtra("ROOM_KEY", "Deku");
+                dekuIntent.putExtra(getString(R.string.room_id_bundle_key), "Deku");
                 startActivity(dekuIntent);
                 break;
             default:

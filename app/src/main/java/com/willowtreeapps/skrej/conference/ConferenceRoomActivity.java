@@ -32,6 +32,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     private ConferencePresenterImpl presenter;
     private Button useButton;
     private GoogleAccountCredential credential;
+    private String roomId;
 
     /**
      * Create the main activity.
@@ -40,6 +41,11 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            roomId = extras.getString(getString(R.string.room_id_bundle_key));
+            Log.d(TAG, roomId);
+        }
         setContentView(R.layout.activity_conference_room);
         presenter = new ConferencePresenterImpl();
         useButton = (Button) findViewById(R.id.useRoomButton);
@@ -121,7 +127,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
 
     @Override
     public Loader<List<Event>> onCreateLoader(int i, Bundle bundle) {
-        return new CalendarLoader(this, credential);
+        return new CalendarLoader(this, credential, "");
     }
 
     @Override
