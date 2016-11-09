@@ -8,14 +8,12 @@ import android.content.Intent;
 
 public interface ConferenceView {
     void startActivityForResult(Intent intent, int requestCode);
-    void showPlayServicesErrorDialog(int statusCode);
-    void showErrorDialog(String message);
+
     void showSpinner();
     void hideSpinner();
     void updateAvailability();
     void updateDate();
     void enableScheduleButton();
     void disableScheduleButton();
-    void onVerifiedValidCredentials();
-    void showUserPermissionsDialog();
+
 }

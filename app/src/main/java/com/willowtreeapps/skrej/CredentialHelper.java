@@ -2,6 +2,7 @@ package com.willowtreeapps.skrej;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -26,9 +27,9 @@ public class CredentialHelper {
 
     public interface CredentialListener {
         void onReceiveValidCredentials(GoogleAccountCredential credential);
-        void onUserResolvablePlayServicesError(int connectionStatusCode);
+        void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode);
         void networkUnavailable();
-        void requestAccountPicker();
+        void requestAccountPicker(Intent acctPickerIntent);
         void requestPermissions();
     }
 
@@ -106,7 +107,7 @@ public class CredentialHelper {
                 credential.setSelectedAccountName(accountName);
                 getValidCredential();
             } else {
-                listener.requestAccountPicker();
+                listener.requestAccountPicker(credential.newChooseAccountIntent());
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
@@ -137,7 +138,7 @@ public class CredentialHelper {
         final int connectionStatusCode =
                 apiAvailability.isGooglePlayServicesAvailable(context);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
-            listener.onUserResolvablePlayServicesError(connectionStatusCode);
+            listener.onUserResolvablePlayServicesError(connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
         }
     }
 

@@ -24,8 +24,8 @@ import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_GOOGLE_PLAY_SERV
  */
 
 public class ConferencePresenterImpl implements ConferencePresenter,
-        LoaderManager.LoaderCallbacks<List<Event>>,
-        CredentialHelper.CredentialListener {
+
+        LoaderManager.LoaderCallbacks<List<Event>>{
 
     private static final String TAG = "ConferencePresenterImpl";
 
@@ -34,11 +34,14 @@ public class ConferencePresenterImpl implements ConferencePresenter,
     private CredentialHelper credentialHelper;
     private ConferenceView view;
 
+    String selectedRoomName;
 
     public ConferencePresenterImpl(Context context, CredentialHelper credentialHelper) {
         this.context = context;
         this.credentialHelper = credentialHelper;
-        this.credentialHelper.registerListener(this);
+        selectedRoomName = ((Activity)context).getIntent().getExtras().getString("room_name");
+
+        Log.d(TAG, "Selected room: " + selectedRoomName);
     }
 
     @Override
@@ -51,34 +54,7 @@ public class ConferencePresenterImpl implements ConferencePresenter,
         this.view = null;
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-        switch(requestCode) {
-            case REQUEST_GOOGLE_PLAY_SERVICES:
-                if (resultCode != RESULT_OK) {
-                    //TODO: Show that user what the real deal is about G00glePlayServices
-                    Log.d(TAG,
-                            "This app requires Google Play Services. Please install " +
-                                    "Google Play Services on your device and relaunch this app.");
-                } else {
-                    //retry with verified google play services
-                    credentialHelper.getValidCredential();
-                }
-                break;
-            case REQUEST_ACCOUNT_PICKER:
-                if (resultCode == RESULT_OK && name != null) {
-                    //retry after selecting account
-                    credentialHelper.onAccountPicked(name);
-                }
-                break;
-            case REQUEST_AUTHORIZATION:
-                if (resultCode == RESULT_OK) {
-                    credentialHelper.getValidCredential();
-                }
-                break;
-        }
-    }
+
 
     @Override
     public void onClickSchedule() {
@@ -112,33 +88,7 @@ public class ConferencePresenterImpl implements ConferencePresenter,
 
     }
 
-    @Override
-    public void onReceiveValidCredentials(GoogleAccountCredential credential) {
-        this.credential = credential;
-        view.onVerifiedValidCredentials();
-    }
 
-    @Override
-    public void onUserResolvablePlayServicesError(int connectionStatusCode) {
-        view.showPlayServicesErrorDialog(connectionStatusCode);
-    }
-
-    @Override
-    public void networkUnavailable() {
-        view.showErrorDialog("Network unavailable");
-    }
-
-    @Override
-    public void requestAccountPicker() {
-        view.startActivityForResult(
-                credential.newChooseAccountIntent(),
-                REQUEST_ACCOUNT_PICKER);
-    }
-
-    @Override
-    public void requestPermissions() {
-        view.showUserPermissionsDialog();
-    }
 
 
 //    @Override
