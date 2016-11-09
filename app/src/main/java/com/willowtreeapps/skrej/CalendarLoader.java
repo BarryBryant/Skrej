@@ -25,10 +25,13 @@ public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
     private GoogleAccountCredential credential;
     private com.google.api.services.calendar.Calendar service;
     private Exception lastError;
+    private String roomId;
 
-    public CalendarLoader(Context context, GoogleAccountCredential credential) {
+    public CalendarLoader(Context context, GoogleAccountCredential credential, String roomId) {
         super(context);
         this.credential = credential;
+//        this.roomId = roomId;
+        this.roomId = CACTUAR_ID; // HARD CODED FOR TESTING LYF
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         service = new com.google.api.services.calendar.Calendar.Builder(
@@ -50,8 +53,7 @@ public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
     private List<Event> getDataFromApi() throws IOException {
         // List the next 10 events from the primary calendar.
         DateTime now = new DateTime(System.currentTimeMillis());
-        //hardcoded to cactuar currently
-        Events events = service.events().list(CACTUAR_ID)
+        Events events = service.events().list(roomId)
                 .setMaxResults(10)
                 .setTimeMin(now)
                 .setOrderBy("startTime")

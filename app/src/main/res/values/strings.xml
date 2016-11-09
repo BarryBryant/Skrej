@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Skrej</string>
+    <string name="credentials_preference_key">credentials</string>
 </resources>

@@ -1,12 +1,13 @@
-package com.willowtreeapps.skrej;
+package com.willowtreeapps.skrej.login;
 
 import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,22 +16,28 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.willowtreeapps.skrej.CredentialHelper;
+import com.willowtreeapps.skrej.R;
+import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
+
 import java.util.List;
 import pub.devrel.easypermissions.EasyPermissions;
 import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 
 
-public class LoginView extends AppCompatActivity
+public class LoginActivity extends AppCompatActivity
         implements
-        LoginViewInterface,
-        EasyPermissions.PermissionCallbacks{
+        LoginView,
+        EasyPermissions.PermissionCallbacks,
+        View.OnClickListener {
 
     //Tag for logging.
     private static final String TAG = "Login activity";
-
+    private static final int CACTUAR = 100;
+    private static final int  DEKU = 101;
     //The presenter for this view.
-    private LoginPresenter presenter;
+    private LoginPresenterImpl presenter;
 
     //A dialog that tells us we're waiting on the API.
     private ProgressDialog waitingForAPILoader;
@@ -41,16 +48,23 @@ public class LoginView extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        Drawable cactuarIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.cactuar_icon, null);
+        addRoomToList("Cactuar", cactuarIcon, CACTUAR);
+
+        Drawable dekuIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.deku_icon, null);
+        addRoomToList("Deku", dekuIcon, DEKU);
+
         //Set up waiting dialog.
         waitingForAPILoader = new ProgressDialog(this);
         waitingForAPILoader.setMessage("Waiting on Google.");
-        waitingForAPILoader.show();
 
         //Create our presenter.
-        presenter = (LoginPresenter) getLastCustomNonConfigurationInstance();
+        presenter = (LoginPresenterImpl) getLastCustomNonConfigurationInstance();
         if (presenter == null) {
             Log.d(TAG, "New Presenter");
-            presenter = new LoginPresenter(this);
+            SharedPreferences preferences = getSharedPreferences(getString(
+                    R.string.credentials_preference_key), MODE_PRIVATE);
+            presenter = new LoginPresenterImpl(new CredentialHelper(this, preferences));
         }
     }
 
@@ -133,12 +147,12 @@ public class LoginView extends AppCompatActivity
      * Show / hide a 'Waiting on google API' dialog.
      */
     @Override
-    public void showSpinner() {
+    public void showLoading() {
         waitingForAPILoader.show();
     }
 
     @Override
-    public void hideSpinner() {
+    public void hideLoading() {
         waitingForAPILoader.hide();
     }
 
@@ -163,11 +177,9 @@ public class LoginView extends AppCompatActivity
      *
      * @param roomName the name of the room.
      * @param roomIcon an icon to display for the room.
-     * @param onClick callback for selecting the room.
      *
      */
-    @Override
-    public void addRoomToList(String roomName, Drawable roomIcon, View.OnClickListener onClick) {
+    private void addRoomToList(String roomName, Drawable roomIcon, int id) {
 
         //Get out list layout.
         LinearLayout roomList = (LinearLayout)findViewById(R.id.room_list_view);
@@ -182,9 +194,10 @@ public class LoginView extends AppCompatActivity
         //Set room name.
         Button roomButton = ((Button)newRoom.findViewById(R.id.room_selector_button));
         roomButton.setText(roomName);
+        roomButton.setId(id);
 
         //Set select callback.
-        roomButton.setOnClickListener(onClick);
+        roomButton.setOnClickListener(this);
 
         //Add room to list.
         roomList.addView(newRoom);
@@ -208,5 +221,23 @@ public class LoginView extends AppCompatActivity
 
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+            case CACTUAR:
+                Intent cactuarIntent = new Intent(this, ConferenceRoomActivity.class);
+                cactuarIntent.putExtra("ROOM_KEY", "Cactuar");
+                startActivity(cactuarIntent);
+                break;
+            case DEKU:
+                Intent dekuIntent = new Intent(this, ConferenceRoomActivity.class);
+                dekuIntent.putExtra("ROOM_KEY", "Deku");
+                startActivity(dekuIntent);
+                break;
+            default:
+                break;
+        }
     }
 }

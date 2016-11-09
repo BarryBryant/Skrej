@@ -1,21 +1,17 @@
-package com.willowtreeapps.skrej;
+package com.willowtreeapps.skrej.login;
 
 import android.accounts.AccountManager;
-import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
-import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-
-import java.util.List;
-
-import pub.devrel.easypermissions.EasyPermissions;
+import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
+import com.willowtreeapps.skrej.CredentialHelper;
+import com.willowtreeapps.skrej.R;
 
 import static android.app.Activity.RESULT_OK;
 import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_ACCOUNT_PICKER;
@@ -28,47 +24,29 @@ import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_GOOGLE_PLAY_SERV
  */
 
 
-public class LoginPresenter implements CredentialHelper.CredentialListener, LoginPresenterInterface{
+public class LoginPresenterImpl implements CredentialHelper.CredentialListener, LoginPresenter {
 
     //Log tag.
     private static final String TAG = "Login presenter";
-
-    //Context.
-    private Context context;
 
     //Class to get credentials.
     private CredentialHelper credentialHelper;
 
     //View instance.
-    private LoginViewInterface view;
+    private LoginView view;
 
-    //A click listener to detect when we select a room from the list.
-    private View.OnClickListener roomClickListener;
 
-    public LoginPresenter(Context context) {
-
-        //Set context and credential helper
-        this.context = context;
-
-        //Create a credential helper to get permissions and google account and stuff.
-        this.credentialHelper = new CredentialHelper(
-            context,
-            ((Activity)context).getPreferences(Context.MODE_PRIVATE)
-        );
-
+    public LoginPresenterImpl(CredentialHelper credentialHelper) {
+        this.credentialHelper = credentialHelper;
         //Register this presenter as a listener to the credential helper.
         this.credentialHelper.registerListener(this);
-
-        //Create click listener for room list.
-        createRoomClickListener();
     }
 
 
     @Override
-    public void bindView(LoginViewInterface view) {
+    public void bindView(LoginView view) {
         this.view = view;
-        this.view.showSpinner();
-
+        this.view.showLoading();
         //Start running credential helper on bind view.
         this.credentialHelper.getValidCredential();
     }
@@ -80,7 +58,6 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-
         String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
         switch(requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
@@ -90,7 +67,7 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
                             "This app requires Google Play Services. Please install " +
                                     "Google Play Services on your device and relaunch this app.");
                 } else {
-                    view.showSpinner();
+                    view.showLoading();
                     //retry with verified google play services
                     credentialHelper.getValidCredential();
                 }
@@ -107,7 +84,6 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
                 }
                 break;
         }
-
     }
 
     /**
@@ -118,25 +94,16 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
      */
     @Override
     public void onReceiveValidCredentials(GoogleAccountCredential credential) {
-
         if(view != null) {
-
             //Hide our waiting dialog.
-            view.hideSpinner();
-            Drawable myRoomIcon;
-
-            myRoomIcon = ResourcesCompat.getDrawable(context.getResources(), R.mipmap.cactuar_icon, null);
-            view.addRoomToList("Cactuar", myRoomIcon, roomClickListener);
-
-            myRoomIcon = ResourcesCompat.getDrawable(context.getResources(), R.mipmap.deku_icon, null);
-            view.addRoomToList("Deku", myRoomIcon, roomClickListener);
+            view.hideLoading();
         }
     }
 
     @Override
     public void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode) {
         if(view != null) {
-            view.hideSpinner();
+            view.hideLoading();
             view.showPlayServicesErrorDialog(connectionStatusCode, requestCode);
         }
     }
@@ -151,7 +118,7 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
     @Override
     public void requestAccountPicker(Intent acctPickerIntent) {
         if(view != null) {
-            view.hideSpinner();
+            view.hideLoading();
             view.startActivityForResult(
                     acctPickerIntent,
                     REQUEST_ACCOUNT_PICKER);
@@ -161,34 +128,10 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
     @Override
     public void requestPermissions() {
         if(view != null) {
-            view.hideSpinner();
+            view.hideLoading();
             view.showUserPermissionsDialog();
         }
     }
 
-    /**
-     *
-     * Create a listener to handle clicking on a room in the list.
-     *
-     */
-    private void createRoomClickListener() {
-
-        roomClickListener = new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                //Get name of selected room.
-                String roomName = ((Button)v).getText().toString();
-                Log.d(TAG, "Room selected: " + roomName);
-
-                //Create activity launch intent with room name.
-                Intent startConfRoomActivityIntent = new Intent(context, ConferenceRoomActivity.class);
-                startConfRoomActivityIntent.putExtra("room_name", roomName);
-
-                //Start conferenceroom activity.
-                view.startActivityForResult(startConfRoomActivityIntent, 0);
-            }
-        };
-    }
 
 }

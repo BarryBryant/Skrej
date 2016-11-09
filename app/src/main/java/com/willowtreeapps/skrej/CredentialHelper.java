@@ -25,6 +25,8 @@ import pub.devrel.easypermissions.EasyPermissions;
 
 public class CredentialHelper {
 
+
+
     public interface CredentialListener {
         void onReceiveValidCredentials(GoogleAccountCredential credential);
         void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode);
@@ -74,6 +76,22 @@ public class CredentialHelper {
             listener.networkUnavailable();
         } else {
             listener.onReceiveValidCredentials(credential);
+        }
+    }
+
+    public boolean isValidCredential(GoogleAccountCredential credential) {
+        if (! isGooglePlayServicesAvailable()) {
+            Log.d(TAG, "no play services");
+            return false;
+        } else if (credential.getSelectedAccountName() == null) {
+            Log.d(TAG, "no account name");
+            return false;
+        } else if (! isDeviceOnline()) {
+            Log.d(TAG, "device offline");
+            return false;
+        } else {
+            Log.d(TAG, "good credentials");
+            return true;
         }
     }
 

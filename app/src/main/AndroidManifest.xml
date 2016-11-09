@@ -13,7 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".LoginView"
+            android:name=".login.LoginActivity"
             android:label="Skrej">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,7 +23,7 @@
         </activity>
 
         <activity
-            android:name=".ConferenceRoomActivity"
+            android:name=".conference.ConferenceRoomActivity"
             android:label="Skrej">
 
         </activity>

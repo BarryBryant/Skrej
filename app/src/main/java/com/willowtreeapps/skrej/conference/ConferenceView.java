@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej;
+package com.willowtreeapps.skrej.conference;
 
 import android.content.Intent;
 
