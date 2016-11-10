@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">Skrej</string>
+
+    <string name="waiting_for_API_message">
+        Waiting on Google
+    </string>
+
+    <string name="account_access_rationale">
+        This app needs to access your Google account (via Contacts).
+    </string>
+
+    <string name="network_unavailable_error_mesg">
+        Network is unavailable.
+    </string>
+
+    <string name="room_name_intent_key" translatable="false">
+        room_name
+    </string>
+
+    <string name="pref_account_name" translatable="false">
+        prefAccountName
+    </string>
+
 </resources>

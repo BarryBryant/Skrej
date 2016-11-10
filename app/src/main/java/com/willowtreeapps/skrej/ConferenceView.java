@@ -13,7 +13,9 @@ public interface ConferenceView {
     void hideSpinner();
     void updateAvailability();
     void updateDate();
+    void updateTime(String newRoomTime);
     void enableScheduleButton();
     void disableScheduleButton();
+    void setRoomName(String roomName);
 
 }

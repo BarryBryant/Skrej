@@ -21,6 +21,7 @@ import static android.app.Activity.RESULT_OK;
 import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_ACCOUNT_PICKER;
 import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_AUTHORIZATION;
 import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_GOOGLE_PLAY_SERVICES;
+import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 
 /**
@@ -45,6 +46,8 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
     //A click listener to detect when we select a room from the list.
     private View.OnClickListener roomClickListener;
 
+    private boolean roomListPopulated = false;
+
     public LoginPresenter(Context context) {
 
         //Set context and credential helper
@@ -53,7 +56,7 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
         //Create a credential helper to get permissions and google account and stuff.
         this.credentialHelper = new CredentialHelper(
             context,
-            ((Activity)context).getPreferences(Context.MODE_PRIVATE)
+            ((Activity)context).getSharedPreferences("shared_prefs", Context.MODE_PRIVATE)
         );
 
         //Register this presenter as a listener to the credential helper.
@@ -81,31 +84,33 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
-        String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-        switch(requestCode) {
-            case REQUEST_GOOGLE_PLAY_SERVICES:
-                if (resultCode != RESULT_OK) {
-                    //TODO: Show that user what the real deal is about G00glePlayServices
-                    Log.d(TAG,
-                            "This app requires Google Play Services. Please install " +
-                                    "Google Play Services on your device and relaunch this app.");
-                } else {
-                    view.showSpinner();
-                    //retry with verified google play services
-                    credentialHelper.getValidCredential();
-                }
-                break;
-            case REQUEST_ACCOUNT_PICKER:
-                if (resultCode == RESULT_OK && name != null) {
-                    //retry after selecting account
-                    credentialHelper.onAccountPicked(name);
-                }
-                break;
-            case REQUEST_AUTHORIZATION:
-                if (resultCode == RESULT_OK) {
-                    credentialHelper.getValidCredential();
-                }
-                break;
+        if(data != null) {
+            String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+            switch (requestCode) {
+                case REQUEST_GOOGLE_PLAY_SERVICES:
+                    if (resultCode != RESULT_OK) {
+                        //TODO: Show that user what the real deal is about G00glePlayServices
+                        Log.d(TAG,
+                                "This app requires Google Play Services. Please install " +
+                                        "Google Play Services on your device and relaunch this app.");
+                    } else {
+                        view.showSpinner();
+                        //retry with verified google play services
+                        credentialHelper.getValidCredential();
+                    }
+                    break;
+                case REQUEST_ACCOUNT_PICKER:
+                    if (resultCode == RESULT_OK && name != null) {
+                        //retry after selecting account
+                        credentialHelper.onAccountPicked(name);
+                    }
+                    break;
+                case REQUEST_AUTHORIZATION:
+                    if (resultCode == RESULT_OK) {
+                        credentialHelper.getValidCredential();
+                    }
+                    break;
+            }
         }
 
     }
@@ -123,13 +128,17 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
 
             //Hide our waiting dialog.
             view.hideSpinner();
-            Drawable myRoomIcon;
+            if (!roomListPopulated) {
+                roomListPopulated = true;
 
-            myRoomIcon = ResourcesCompat.getDrawable(context.getResources(), R.mipmap.cactuar_icon, null);
-            view.addRoomToList("Cactuar", myRoomIcon, roomClickListener);
+                Drawable myRoomIcon;
 
-            myRoomIcon = ResourcesCompat.getDrawable(context.getResources(), R.mipmap.deku_icon, null);
-            view.addRoomToList("Deku", myRoomIcon, roomClickListener);
+                myRoomIcon = ResourcesCompat.getDrawable(context.getResources(), R.mipmap.cactuar_icon, null);
+                view.addRoomToList("Cactuar", myRoomIcon, roomClickListener);
+
+                myRoomIcon = ResourcesCompat.getDrawable(context.getResources(), R.mipmap.deku_icon, null);
+                view.addRoomToList("Deku", myRoomIcon, roomClickListener);
+            }
         }
     }
 
@@ -144,7 +153,7 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
     @Override
     public void networkUnavailable() {
         if(view != null) {
-            view.showErrorDialog("Network is unavailable");
+            view.showErrorDialog(context.getString(R.string.network_unavailable_error_mesg));
         }
     }
 
@@ -162,7 +171,7 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
     public void requestPermissions() {
         if(view != null) {
             view.hideSpinner();
-            view.showUserPermissionsDialog();
+            view.showUserPermissionsDialog(REQUEST_PERMISSION_GET_ACCOUNTS);
         }
     }
 
@@ -183,9 +192,9 @@ public class LoginPresenter implements CredentialHelper.CredentialListener, Logi
 
                 //Create activity launch intent with room name.
                 Intent startConfRoomActivityIntent = new Intent(context, ConferenceRoomActivity.class);
-                startConfRoomActivityIntent.putExtra("room_name", roomName);
+                startConfRoomActivityIntent.putExtra(context.getString(R.string.room_name_intent_key), roomName);
 
-                //Start conferenceroom activity.
+                //Start conference room activity.
                 view.startActivityForResult(startConfRoomActivityIntent, 0);
             }
         };

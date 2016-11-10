@@ -11,6 +11,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 
@@ -37,9 +38,10 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_conference_room);
         presenter = (ConferencePresenterImpl) getLastCustomNonConfigurationInstance();
+
         if (presenter == null) {
             Log.d(TAG, "New Presenter");
-            presenter = new ConferencePresenterImpl(this, new CredentialHelper(this, getPreferences(Context.MODE_PRIVATE)));
+            presenter = new ConferencePresenterImpl(this);
         }
         useButton = (Button) findViewById(R.id.useRoomButton);
         useButton.setOnClickListener(this);
@@ -50,6 +52,8 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         Log.d(TAG, "onResume");
         super.onResume();
         presenter.bindView(this);
+        presenter.loadCalendar();
+        presenter.initializeLoader(this);
     }
 
     @Override
@@ -82,7 +86,13 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
 
     @Override
     public void updateDate() {
+    }
 
+    @Override
+    public void updateTime(String newRoomTime) {
+
+        TextView timeView = (TextView)findViewById(R.id.timeInfoText);
+        timeView.setText(newRoomTime);
     }
 
     @Override
@@ -112,4 +122,8 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         return presenter;
     }
 
+    @Override
+    public void setRoomName(String roomName) {
+        ((TextView)findViewById(R.id.roomNameText)).setText(roomName);
+    }
 }

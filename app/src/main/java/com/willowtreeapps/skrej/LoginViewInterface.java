@@ -15,6 +15,6 @@ public interface LoginViewInterface {
     void showErrorDialog(String message);
     void showSpinner();
     void hideSpinner();
-    void showUserPermissionsDialog();
+    void showUserPermissionsDialog(int permissionRequest);
     void addRoomToList(String roomName, Drawable roomIcon, View.OnClickListener onClick);
 }

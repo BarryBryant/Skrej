@@ -21,14 +21,17 @@ import java.util.List;
 public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
 
     private static final String CACTUAR_ID = "willowtreeapps.com_3632363436343537393337@resource.calendar.google.com";
+    private static final String DEKU_ID = "willowtreeapps.com_2d3531383336393730383033@resource.calendar.google.com";
 
     private GoogleAccountCredential credential;
     private com.google.api.services.calendar.Calendar service;
     private Exception lastError;
+    private String roomName;
 
-    public CalendarLoader(Context context, GoogleAccountCredential credential) {
+    public CalendarLoader(Context context, GoogleAccountCredential credential, String roomName) {
         super(context);
         this.credential = credential;
+        this.roomName = roomName;
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         service = new com.google.api.services.calendar.Calendar.Builder(
@@ -51,7 +54,14 @@ public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
         // List the next 10 events from the primary calendar.
         DateTime now = new DateTime(System.currentTimeMillis());
         //hardcoded to cactuar currently
-        Events events = service.events().list(CACTUAR_ID)
+
+        String roomId;
+
+        roomId = DEKU_ID;
+        if(roomName.equals("Cactuar")) {
+            roomId = CACTUAR_ID;
+        }
+        Events events = service.events().list(roomId)
                 .setMaxResults(10)
                 .setTimeMin(now)
                 .setOrderBy("startTime")

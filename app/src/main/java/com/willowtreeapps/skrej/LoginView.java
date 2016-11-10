@@ -3,7 +3,6 @@ package com.willowtreeapps.skrej;
 import android.Manifest;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.support.annotation.NonNull;
@@ -17,7 +16,6 @@ import android.widget.LinearLayout;
 import com.google.android.gms.common.GoogleApiAvailability;
 import java.util.List;
 import pub.devrel.easypermissions.EasyPermissions;
-import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 
 
@@ -43,7 +41,7 @@ public class LoginView extends AppCompatActivity
 
         //Set up waiting dialog.
         waitingForAPILoader = new ProgressDialog(this);
-        waitingForAPILoader.setMessage("Waiting on Google.");
+        waitingForAPILoader.setMessage(getString(R.string.waiting_for_API_message));
         waitingForAPILoader.show();
 
         //Create our presenter.
@@ -148,11 +146,11 @@ public class LoginView extends AppCompatActivity
      *
      */
     @Override
-    public void showUserPermissionsDialog() {
+    public void showUserPermissionsDialog(int permissionRequest) {
         EasyPermissions.requestPermissions(
             this,
-            "This app needs to access your Google account (via Contacts).",
-            REQUEST_PERMISSION_GET_ACCOUNTS,
+            getString(R.string.account_access_rationale),
+            permissionRequest,
             Manifest.permission.GET_ACCOUNTS
         );
     }
@@ -198,10 +196,10 @@ public class LoginView extends AppCompatActivity
      * @param perms
      */
     @Override
-    public void onPermissionsGranted(int requestCode, List<String> perms) {    }
+    public void onPermissionsGranted(int requestCode, List<String> perms) { }
 
     @Override
-    public void onPermissionsDenied(int requestCode, List<String> perms) {    }
+    public void onPermissionsDenied(int requestCode, List<String> perms) { }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {

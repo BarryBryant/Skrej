@@ -37,6 +37,8 @@ public class CredentialHelper {
     public static final int REQUEST_AUTHORIZATION = 1001;
     public static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
+
+
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String TAG = "ConferencePresenterImpl";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
@@ -80,7 +82,7 @@ public class CredentialHelper {
     public void onAccountPicked(String name) {
         if (name != null) {
             SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(PREF_ACCOUNT_NAME, name);
+            editor.putString(context.getString(R.string.pref_account_name), name);
             editor.apply();
             credential.setSelectedAccountName(name);
             getValidCredential();
