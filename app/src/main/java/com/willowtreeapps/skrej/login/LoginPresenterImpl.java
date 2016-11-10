@@ -1,17 +1,10 @@
 package com.willowtreeapps.skrej.login;
 
-import android.accounts.AccountManager;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
-import android.support.v4.content.res.ResourcesCompat;
 import android.util.Log;
-import android.view.View;
-import android.widget.Button;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 import com.willowtreeapps.skrej.CredentialHelper;
-import com.willowtreeapps.skrej.R;
 
 import static android.app.Activity.RESULT_OK;
 import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_ACCOUNT_PICKER;
@@ -57,9 +50,8 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-        switch(requestCode) {
+    public void onActivityResult(int requestCode, int resultCode, String name) {
+        switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode != RESULT_OK) {
                     //TODO: Show that user what the real deal is about G00glePlayServices
@@ -87,14 +79,13 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
     }
 
     /**
-     *
      * We have valid credentials now and we can show the list of rooms.
      *
      * @param credential
      */
     @Override
     public void onReceiveValidCredentials(GoogleAccountCredential credential) {
-        if(view != null) {
+        if (view != null) {
             //Hide our waiting dialog.
             view.hideLoading();
         }
@@ -102,7 +93,7 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
 
     @Override
     public void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode) {
-        if(view != null) {
+        if (view != null) {
             view.hideLoading();
             view.showPlayServicesErrorDialog(connectionStatusCode, requestCode);
         }
@@ -110,24 +101,22 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
 
     @Override
     public void networkUnavailable() {
-        if(view != null) {
+        if (view != null) {
             view.showErrorDialog("Network is unavailable");
         }
     }
 
     @Override
-    public void requestAccountPicker(Intent acctPickerIntent) {
-        if(view != null) {
+    public void requestAccountPicker() {
+        if (view != null) {
             view.hideLoading();
-            view.startActivityForResult(
-                    acctPickerIntent,
-                    REQUEST_ACCOUNT_PICKER);
+            view.showAccountPicker();
         }
     }
 
     @Override
     public void requestPermissions() {
-        if(view != null) {
+        if (view != null) {
             view.hideLoading();
             view.showUserPermissionsDialog();
         }

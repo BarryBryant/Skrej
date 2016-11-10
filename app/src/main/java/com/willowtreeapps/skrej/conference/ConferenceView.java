@@ -10,11 +10,17 @@ import com.google.api.services.calendar.model.Event;
 
 public interface ConferenceView {
     void showSpinner();
+
     void hideSpinner();
+
     void updateAvailability(String availability);
+
     void updateAvailabilityTimeInfo(String availabilityTimeInfo);
+
     void updateDate(String date);
+
     void enableScheduleButton();
+
     void disableScheduleButton();
 
 }

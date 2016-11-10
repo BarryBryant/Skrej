@@ -10,7 +10,10 @@ import java.util.List;
 
 public interface ConferencePresenter {
     void bindView(ConferenceView view);
+
     void unbindView();
+
     void onEventsLoaded(List<Event> events);
+
     void onClickSchedule();
 }
