@@ -101,30 +101,34 @@ public class ConferencePresenterImpl implements ConferencePresenter,
         return (retVal);
     }
 
+    private long freeTimeStart;
+    private long freeTimeLength;
+
     @Override
     public void onLoadFinished(Loader<List<Event>> loader, List<Event> data) {
         Log.d(TAG, "" + data.size());
 
-        Event myEvent;
-        myEvent = data.get(0);
-
-        EventDateTime myTime = myEvent.getStart();
 
 
 
-        Long myMillis = myTime.getDateTime().getValue();
+        //Check availablility.
+        checkRoomAvailability(data);
 
-        Date date = new Date(myMillis); // *1000 is to convert seconds to milliseconds
-        SimpleDateFormat sdf = new SimpleDateFormat("HH:mm a \n EEE, d MMM yyyy"); // the format of your date
-       // sdf.setTimeZone(TimeZone.getTimeZone("GMT-4")); // give a timezone reference for formating (see comment at the bottom
-        String formattedTime = sdf.format(date);
+        //If the room is free between any of the cheduled events...
+        if(freeTimeLength > 0) {
 
+            Date startDate = new Date(freeTimeStart);
+            Date lengthDate = new Date(freeTimeStart + freeTimeLength);
+            SimpleDateFormat startSDF = new SimpleDateFormat("hh:mm a");
+            SimpleDateFormat lengthSDF = new SimpleDateFormat("hh:mm a");
+            String startTime = startSDF.format(startDate);
+            String lengthTime = lengthSDF.format(lengthDate);
+            view.updateTime("From: " + startTime + "\nUntil: " + lengthTime);
+        }
 
-
-
-
-
-        view.updateTime(formattedTime);
+        else {
+            view.updateTime("Room is booked up.");
+        }
     }
 
     @Override
@@ -133,6 +137,82 @@ public class ConferencePresenterImpl implements ConferencePresenter,
     }
 
 
+
+    private void checkRoomAvailability(List<Event> roomSchedule) {
+
+        //Get current time.
+        long currentTime = System.currentTimeMillis();
+
+        //Init event times.
+        long eventEndTime = 0;
+        long eventStartTime = 0;
+
+        //Init free time length.
+        freeTimeLength = 0;
+
+        //Init flag for room occupied.
+        boolean roomCurrentlyOccupied = false;
+
+        //For all scheduled events...
+        for(Event event : roomSchedule) {
+
+            //Get event start time.
+            eventStartTime = event.getStart().getDateTime().getValue();
+
+            //If we have not seen that the room is occupied...
+            if(!roomCurrentlyOccupied) {
+
+                //If an event has not yet started...
+                if (eventStartTime > currentTime) {
+
+                    //Get length of time until next event.
+                    freeTimeLength = eventStartTime - currentTime;
+
+                    //The room is available right now.
+                    freeTimeStart = currentTime;
+
+                    //And we're done.
+                    break;
+
+                //If an event is currently in progress...
+                } else {
+
+                    //Set occupied flag.
+                    roomCurrentlyOccupied = true;
+
+                    //Get end time for this event.
+                    eventEndTime = event.getEnd().getDateTime().getValue();
+
+                    //Go on to check next event.
+                }
+            }
+
+            //If the room is currently occupied...
+            else {
+
+                //If there is any time between the start of this event and the end of the last
+                //event...
+                if(eventStartTime > eventEndTime) {
+
+                    //Set available time length.
+                    freeTimeLength = (eventStartTime - eventEndTime);
+
+                    //Room is available at the end of the last event.
+                    freeTimeStart = eventEndTime;
+
+                    //And we're done.
+                    break;
+                }
+
+                //If there is no time between this event and the last one...
+                else {
+
+                    //Update end time and check next event.
+                    eventEndTime = event.getEnd().getDateTime().getValue();
+                }
+            }
+        }
+    }
 
 
 //    @Override
