@@ -1,8 +1,8 @@
 package com.willowtreeapps.skrej;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -19,45 +19,36 @@ import java.util.Arrays;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static com.willowtreeapps.skrej.ConferenceRoomActivity.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.ConferenceRoomActivity.REQUEST_PERMISSION_GET_ACCOUNTS;
+
 /**
- * Created by barrybryant on 11/8/16.
+ * Created by barrybryant on 11/7/16.
  */
 
-public class CredentialHelper {
+public class CalendarApi {
 
 
+    static final int REQUEST_ACCOUNT_PICKER = 1000;
+    static final int REQUEST_AUTHORIZATION = 1001;
+    static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
+    static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
-    public interface CredentialListener {
-        void onReceiveValidCredentials(GoogleAccountCredential credential);
-        void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode);
-        void networkUnavailable();
-        void requestAccountPicker(Intent acctPickerIntent);
-        void requestPermissions();
-    }
-
-    public static final int REQUEST_ACCOUNT_PICKER = 1000;
-    public static final int REQUEST_AUTHORIZATION = 1001;
-    public static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
-    public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String TAG = "ConferencePresenterImpl";
+
+    private static final String TAG = "CalendarApi";
     private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
 
-    private GoogleAccountCredential credential;
+    private GoogleAccountCredential mCredential;
     private Context context;
     private SharedPreferences preferences;
-    private CredentialListener listener;
 
-    public CredentialHelper(Context context, SharedPreferences preferences) {
-        this.context = context;
+    public CalendarApi(Context context, SharedPreferences preferences) {
         this.preferences = preferences;
-        credential = GoogleAccountCredential.usingOAuth2(
+        this.context = context;
+        mCredential = GoogleAccountCredential.usingOAuth2(
                 context.getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
-    }
-
-    public void registerListener(CredentialListener listener) {
-        this.listener = listener;
     }
 
     /**
@@ -67,44 +58,17 @@ public class CredentialHelper {
      * of the preconditions are not satisfied, the app will prompt the user as
      * appropriate.
      */
-    public void getValidCredential() {
+    private void getResultsFromApi() {
         if (! isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
-        } else if (credential.getSelectedAccountName() == null) {
+        } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
         } else if (! isDeviceOnline()) {
-            listener.networkUnavailable();
+            Log.d(TAG, "No network available");
         } else {
-            listener.onReceiveValidCredentials(credential);
+            new CalendarRequestTask(mCredential).execute();
         }
     }
-
-    public boolean isValidCredential(GoogleAccountCredential credential) {
-        if (! isGooglePlayServicesAvailable()) {
-            Log.d(TAG, "no play services");
-            return false;
-        } else if (credential.getSelectedAccountName() == null) {
-            Log.d(TAG, "no account name");
-            return false;
-        } else if (! isDeviceOnline()) {
-            Log.d(TAG, "device offline");
-            return false;
-        } else {
-            Log.d(TAG, "good credentials");
-            return true;
-        }
-    }
-
-    public void onAccountPicked(String name) {
-        if (name != null) {
-            SharedPreferences.Editor editor = preferences.edit();
-            editor.putString(PREF_ACCOUNT_NAME, name);
-            editor.apply();
-            credential.setSelectedAccountName(name);
-            getValidCredential();
-        }
-    }
-
 
     /**
      * Attempts to set the account used with the API credentials. If an account
@@ -122,14 +86,21 @@ public class CredentialHelper {
                 context, Manifest.permission.GET_ACCOUNTS)) {
             String accountName = preferences.getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
-                credential.setSelectedAccountName(accountName);
-                getValidCredential();
+                mCredential.setSelectedAccountName(accountName);
+                getResultsFromApi();
             } else {
-                listener.requestAccountPicker(credential.newChooseAccountIntent());
+                // Start a dialog from which the user can choose an account
+//                startActivityForResult(
+//                        mCredential.newChooseAccountIntent(),
+//                        REQUEST_ACCOUNT_PICKER);
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
-            listener.requestPermissions();
+            EasyPermissions.requestPermissions(
+                    this,
+                    "This app needs to access your Google account (via Contacts).",
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
+                    Manifest.permission.GET_ACCOUNTS);
         }
     }
 
@@ -156,7 +127,7 @@ public class CredentialHelper {
         final int connectionStatusCode =
                 apiAvailability.isGooglePlayServicesAvailable(context);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
-            listener.onUserResolvablePlayServicesError(connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
+//            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
     }
 
@@ -170,4 +141,6 @@ public class CredentialHelper {
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
     }
+
+
 }
