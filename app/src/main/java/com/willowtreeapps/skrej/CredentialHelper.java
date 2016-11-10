@@ -26,12 +26,15 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class CredentialHelper {
 
 
-
     public interface CredentialListener {
         void onReceiveValidCredentials(GoogleAccountCredential credential);
+
         void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode);
+
         void networkUnavailable();
-        void requestAccountPicker(Intent acctPickerIntent);
+
+        void requestAccountPicker();
+
         void requestPermissions();
     }
 
@@ -41,7 +44,7 @@ public class CredentialHelper {
     public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String TAG = "ConferencePresenterImpl";
-    private static final String[] SCOPES = { CalendarScopes.CALENDAR_READONLY };
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
 
     private GoogleAccountCredential credential;
     private Context context;
@@ -56,6 +59,10 @@ public class CredentialHelper {
                 .setBackOff(new ExponentialBackOff());
     }
 
+    public GoogleAccountCredential getCredential() {
+        return credential;
+    }
+
     public void registerListener(CredentialListener listener) {
         this.listener = listener;
     }
@@ -68,25 +75,25 @@ public class CredentialHelper {
      * appropriate.
      */
     public void getValidCredential() {
-        if (! isGooglePlayServicesAvailable()) {
+        if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (credential.getSelectedAccountName() == null) {
             chooseAccount();
-        } else if (! isDeviceOnline()) {
+        } else if (!isDeviceOnline()) {
             listener.networkUnavailable();
         } else {
             listener.onReceiveValidCredentials(credential);
         }
     }
 
-    public boolean isValidCredential(GoogleAccountCredential credential) {
-        if (! isGooglePlayServicesAvailable()) {
+    public boolean hasValidCredential() {
+        if (!isGooglePlayServicesAvailable()) {
             Log.d(TAG, "no play services");
             return false;
         } else if (credential.getSelectedAccountName() == null) {
             Log.d(TAG, "no account name");
             return false;
-        } else if (! isDeviceOnline()) {
+        } else if (!isDeviceOnline()) {
             Log.d(TAG, "device offline");
             return false;
         } else {
@@ -125,7 +132,7 @@ public class CredentialHelper {
                 credential.setSelectedAccountName(accountName);
                 getValidCredential();
             } else {
-                listener.requestAccountPicker(credential.newChooseAccountIntent());
+                listener.requestAccountPicker();
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
@@ -135,8 +142,9 @@ public class CredentialHelper {
 
     /**
      * Check that Google Play services APK is installed and up to date.
+     *
      * @return true if Google Play Services is available and up to
-     *     date on this device; false otherwise.
+     * date on this device; false otherwise.
      */
     private boolean isGooglePlayServicesAvailable() {
         GoogleApiAvailability apiAvailability =
@@ -162,6 +170,7 @@ public class CredentialHelper {
 
     /**
      * Checks whether the device currently has a network connection.
+     *
      * @return true if the device has a network connection, false otherwise.
      */
     private boolean isDeviceOnline() {

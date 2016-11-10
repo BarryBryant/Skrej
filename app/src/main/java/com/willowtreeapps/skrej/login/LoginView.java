@@ -9,11 +9,16 @@ import android.view.View;
  */
 
 public interface LoginView {
-
-    void startActivityForResult(Intent intent, int requestCode);
+    
     void showPlayServicesErrorDialog(int statusCode, int requestCode);
+
     void showErrorDialog(String message);
+
     void showLoading();
+
     void hideLoading();
+
     void showUserPermissionsDialog();
+
+    void showAccountPicker();
 }

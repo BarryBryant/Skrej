@@ -9,6 +9,8 @@ import android.content.Intent;
 public interface LoginPresenter {
 
     void bindView(LoginView view);
+
     void unbindView();
-    void onActivityResult(int requestCode, int resultCode, Intent data);
+
+    void onActivityResult(int requestCode, int resultCode, String name);
 }
