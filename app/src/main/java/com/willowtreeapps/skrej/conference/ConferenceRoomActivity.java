@@ -1,7 +1,6 @@
 package com.willowtreeapps.skrej.conference;
 
 import android.app.LoaderManager;
-import android.content.Context;
 import android.content.Loader;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -9,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.util.ExponentialBackOff;
@@ -31,6 +31,9 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
 
     private ConferencePresenterImpl presenter;
     private Button useButton;
+    private TextView availabilityTextView;
+    private TextView availabilityTimeInfoTextView;
+    private TextView dateTextView;
     private GoogleAccountCredential credential;
     private String roomId;
 
@@ -50,6 +53,9 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         presenter = new ConferencePresenterImpl();
         useButton = (Button) findViewById(R.id.useRoomButton);
         useButton.setOnClickListener(this);
+        availabilityTextView = (TextView) findViewById(R.id.statusText);
+        availabilityTimeInfoTextView = (TextView) findViewById(R.id.timeInfoText);
+        dateTextView = (TextView) findViewById(R.id.dateText);
         setupLoader();
     }
 
@@ -57,7 +63,6 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     protected void onResume() {
         Log.d(TAG, "onResume");
         super.onResume();
-        presenter.bindView(this);
     }
 
     @Override
@@ -65,6 +70,13 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         Log.d(TAG, "onPause");
         super.onPause();
         presenter.unbindView();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        presenter.bindView(this);
+        Log.d(TAG, "onStart");
     }
 
     @Override
@@ -78,13 +90,18 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     }
 
     @Override
-    public void updateAvailability() {
-
+    public void updateAvailability(String availability) {
+        availabilityTextView.setText(availability);
     }
 
     @Override
-    public void updateDate() {
+    public void updateAvailabilityTimeInfo(String availabilityTimeInfo) {
+        availabilityTimeInfoTextView.setText(availabilityTimeInfo);
+    }
 
+    @Override
+    public void updateDate(String date) {
+        dateTextView.setText(date);
     }
 
     @Override
@@ -101,7 +118,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.useRoomButton:
-                presenter.loadCalendar();
+                break;
             default:
                 break;
         }
@@ -133,6 +150,8 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     @Override
     public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
         Log.d(TAG, "number of events:" + events.size());
+        presenter.onEventsLoaded(events);
+
     }
 
     @Override
