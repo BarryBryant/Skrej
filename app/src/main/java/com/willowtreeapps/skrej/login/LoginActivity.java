@@ -37,6 +37,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
     private static final String TAG = "Login activity";
     private static final int CACTUAR = 100;
     private static final int DEKU = 101;
+    private static final int SUDOWOODO = 102;
+    private static final int ELDERBERRY = 103;
 
     //The presenter for this view.
     @Inject
@@ -54,6 +56,10 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
         addRoomToList("Cactuar", cactuarIcon, CACTUAR);
         Drawable dekuIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.deku_icon, null);
         addRoomToList("Deku", dekuIcon, DEKU);
+        Drawable sudowoodoIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.sudowoodo_icon, null);
+        addRoomToList("Sudowoodo", sudowoodoIcon, SUDOWOODO);
+        Drawable elderberryIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.elderberry_icon, null);
+        addRoomToList("Elderberry", elderberryIcon, ELDERBERRY);
         //Set up waiting dialog.
     }
 
@@ -218,6 +224,16 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
                 Intent dekuIntent = new Intent(this, ConferenceRoomActivity.class);
                 dekuIntent.putExtra(getString(R.string.room_id_bundle_key), "Deku");
                 startActivity(dekuIntent);
+                break;
+            case SUDOWOODO:
+                Intent sudowoodoIntent = new Intent(this, ConferenceRoomActivity.class);
+                sudowoodoIntent.putExtra(getString(R.string.room_id_bundle_key), "Sudowoodo");
+                startActivity(sudowoodoIntent);
+                break;
+            case ELDERBERRY:
+                Intent elderberryIntent = new Intent(this, ConferenceRoomActivity.class);
+                elderberryIntent.putExtra(getString(R.string.room_id_bundle_key), "Elderberry");
+                startActivity(elderberryIntent);
                 break;
             default:
                 break;

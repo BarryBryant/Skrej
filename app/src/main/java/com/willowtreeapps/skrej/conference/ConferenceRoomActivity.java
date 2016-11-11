@@ -57,6 +57,8 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         availabilityTextView = (TextView) findViewById(R.id.statusText);
         availabilityTimeInfoTextView = (TextView) findViewById(R.id.timeInfoText);
         dateTextView = (TextView) findViewById(R.id.dateText);
+        TextView nameText = (TextView)findViewById(R.id.roomNameText);
+        nameText.setText(roomId);
         setupLoader();
     }
 
@@ -124,6 +126,8 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
                 break;
         }
     }
+
+
 
     private void setupLoader() {
         if (credentialHelper.hasValidCredential()) {
