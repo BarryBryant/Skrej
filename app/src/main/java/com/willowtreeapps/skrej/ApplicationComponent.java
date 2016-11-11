@@ -17,4 +17,6 @@ public interface ApplicationComponent {
     void inject(LoginActivity activity);
 
     void inject(ConferenceRoomActivity activity);
+
+    void inject(CalendarLoader loader);
 }

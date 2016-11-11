@@ -14,30 +14,26 @@ import com.google.api.services.calendar.model.Events;
 import java.io.IOException;
 import java.util.List;
 
+import javax.inject.Inject;
+
 /**
  * Created by barrybryant on 11/8/16.
  */
 
 public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
 
-    private static final String CACTUAR_ID = "willowtreeapps.com_3632363436343537393337@resource.calendar.google.com";
+    @Inject
+    CredentialHelper credentialHelper;
 
-    private GoogleAccountCredential credential;
     private com.google.api.services.calendar.Calendar service;
     private Exception lastError;
     private String roomId;
 
-    public CalendarLoader(Context context, GoogleAccountCredential credential, String roomId) {
+    public CalendarLoader(Context context, String roomId) {
         super(context);
-        this.credential = credential;
-//        this.roomId = roomId;
-        this.roomId = CACTUAR_ID; // HARD CODED FOR TESTING LYF
-        HttpTransport transport = AndroidHttp.newCompatibleTransport();
-        JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-        service = new com.google.api.services.calendar.Calendar.Builder(
-                transport, jsonFactory, credential)
-                .setApplicationName("Google Calendar API Android Quickstart")
-                .build();
+        ConferenceApplication.get(context.getApplicationContext()).component().inject(this);
+        this.roomId = roomId;
+        service = credentialHelper.getCalendarService();
     }
 
     @Override
