@@ -39,10 +39,23 @@ public class ConferencePresenterImpl implements ConferencePresenter {
     @Override
     public void onEventsLoaded(List<Event> events) {
         Log.d(TAG, "Events loaded to presenter");
-        this.todaysEvents = EventTimeUtility.filterEventsForToday(events);
-        Event event = events.get(0);
-        String availability = getRoomAvailability(event);
-        String availabilityTimeInfo = getRoomAvailabilityTimeInfo(event);
+        String availability = "";
+        String availabilityTimeInfo = "";
+
+        if(events.size() <= 0) {
+
+            availability = "Available";
+            availabilityTimeInfo = "All day";
+        }
+
+        else {
+            this.todaysEvents = EventTimeUtility.filterEventsForToday(events);
+
+            Event event = events.get(0);
+            availability = getRoomAvailability(event);
+            availabilityTimeInfo = getRoomAvailabilityTimeInfo(event);
+        }
+
         if (view != null) {
             view.updateAvailability(availability);
             view.updateAvailabilityTimeInfo(availabilityTimeInfo);
