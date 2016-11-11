@@ -25,6 +25,10 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         LoaderManager.LoaderCallbacks<List<Event>> {
 
     private static final String TAG = "ConferenceRoomActivity";
+    private static final String CACTUAR_ID = "willowtreeapps.com_3632363436343537393337@resource.calendar.google.com";
+    private static final String DEKU_ID = "willowtreeapps.com_2d3531383336393730383033@resource.calendar.google.com";
+    private static final String ELDERBERRY_ID = "willowtreeapps.com_2d3839383537323139333730@resource.calendar.google.com";
+    private static final String SUDOWOODO_ID = "willowtreeapps.com_2d3331363639303230383838@resource.calendar.google.com";
 
     @Inject
     ConferencePresenter presenter;
@@ -35,7 +39,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     private TextView availabilityTextView;
     private TextView availabilityTimeInfoTextView;
     private TextView dateTextView;
-    private String roomId;
+    private String roomName;
 
     /**
      * Create the main activity.
@@ -48,14 +52,15 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         ConferenceApplication.get(this).component().inject(this);
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            roomId = extras.getString(getString(R.string.room_id_bundle_key));
-            Log.d(TAG, roomId);
+            roomName = extras.getString(getString(R.string.room_id_bundle_key));
         }
         setContentView(R.layout.activity_conference_room);
         useButton = (Button) findViewById(R.id.useRoomButton);
         useButton.setOnClickListener(this);
         availabilityTextView = (TextView) findViewById(R.id.statusText);
         availabilityTimeInfoTextView = (TextView) findViewById(R.id.timeInfoText);
+        TextView roomNameTextView = (TextView) findViewById(R.id.roomNameText);
+        roomNameTextView.setText(roomName);
         dateTextView = (TextView) findViewById(R.id.dateText);
         setupLoader();
     }
@@ -136,8 +141,9 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
 
     @Override
     public Loader<List<Event>> onCreateLoader(int i, Bundle bundle) {
+        String roomId = getRoomId(roomName);
         GoogleAccountCredential credential = credentialHelper.getCredential();
-        return new CalendarLoader(this, credential, roomId);
+        return new CalendarLoader(this, roomId);
     }
 
     @Override
@@ -150,5 +156,20 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     @Override
     public void onLoaderReset(Loader<List<Event>> loader) {
 
+    }
+
+    private String getRoomId(String roomName) {
+        switch (roomName) {
+            case "Cactuar":
+                return CACTUAR_ID;
+            case "Deku":
+                return DEKU_ID;
+            case "Elderberry":
+                return ELDERBERRY_ID;
+            case "Sudowoodo":
+                return SUDOWOODO_ID;
+            default:
+                throw new Error("WRONG FUCKING ROOM NAME");
+        }
     }
 }
