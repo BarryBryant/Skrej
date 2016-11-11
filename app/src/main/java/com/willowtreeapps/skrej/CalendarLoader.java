@@ -21,6 +21,10 @@ import java.util.List;
 public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
 
     private static final String CACTUAR_ID = "willowtreeapps.com_3632363436343537393337@resource.calendar.google.com";
+    private static final String DEKU_ID = "willowtreeapps.com_2d3531383336393730383033@resource.calendar.google.com";
+    private static final String SUDOWOODO_ID = "willowtreeapps.com_2d3331363639303230383838@resource.calendar.google.com";
+    private static final String ELDERBERRY_ID = "willowtreeapps.com_2d3839383537323139333730@resource.calendar.google.com";
+
 
     private GoogleAccountCredential credential;
     private com.google.api.services.calendar.Calendar service;
@@ -30,8 +34,24 @@ public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
     public CalendarLoader(Context context, GoogleAccountCredential credential, String roomId) {
         super(context);
         this.credential = credential;
-//        this.roomId = roomId;
-        this.roomId = CACTUAR_ID; // HARD CODED FOR TESTING LYF
+
+
+        switch(roomId) {
+            case "Cactuar":
+                this.roomId = CACTUAR_ID;
+                break;
+            case "Deku":
+                this.roomId = DEKU_ID;
+                break;
+            case "Sudowoodo":
+                this.roomId = SUDOWOODO_ID;
+                break;
+            case "Elderberry":
+            default:
+                this.roomId = ELDERBERRY_ID;
+                break;
+        }
+
         HttpTransport transport = AndroidHttp.newCompatibleTransport();
         JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
         service = new com.google.api.services.calendar.Calendar.Builder(
