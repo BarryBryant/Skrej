@@ -52,7 +52,7 @@ public class EventService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        String roomId = intent.getStringExtra(getString(R.string.room_id_intent_key));
+        String roomId = intent.getStringExtra(getString(R.string.room_id_bundle_key));
         //create receiver notify of start download
         try {
             createEvent(roomId);

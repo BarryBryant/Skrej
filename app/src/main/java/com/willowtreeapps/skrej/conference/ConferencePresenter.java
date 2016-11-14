@@ -1,6 +1,8 @@
 package com.willowtreeapps.skrej.conference;
 
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
+import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
 
 import java.util.List;
 
@@ -9,6 +11,7 @@ import java.util.List;
  */
 
 public interface ConferencePresenter {
+
     void bindView(ConferenceView view);
 
     void unbindView();
@@ -16,4 +19,6 @@ public interface ConferencePresenter {
     void onEventsLoaded(List<Event> events);
 
     void onClickSchedule();
+
+
 }

@@ -9,64 +9,94 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
 import com.google.api.services.calendar.model.Event;
 import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
 import com.willowtreeapps.skrej.ConferenceApplication;
-import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.R;
+import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.calendarapi.EventService;
-
 import java.util.List;
-
 import javax.inject.Inject;
 
-public class ConferenceRoomActivity extends AppCompatActivity implements ConferenceView,
-        View.OnClickListener,
-        LoaderManager.LoaderCallbacks<List<Event>>,CalendarLoader.CalendarLoadedAuthRequestListener {
+public class ConferenceRoomActivity
 
-    private static final String TAG = "ConferenceRoomActivity";
-    private static final String CACTUAR_ID = "willowtreeapps.com_3632363436343537393337@resource.calendar.google.com";
-    private static final String DEKU_ID = "willowtreeapps.com_2d3531383336393730383033@resource.calendar.google.com";
-    private static final String ELDERBERRY_ID = "willowtreeapps.com_2d3839383537323139333730@resource.calendar.google.com";
-    private static final String SUDOWOODO_ID = "willowtreeapps.com_2d3331363639303230383838@resource.calendar.google.com";
-    private static final String BARRY_ID = "barry.bryant@willowtreeapps.com";
+        extends
+        AppCompatActivity
+
+        implements
+        ConferenceView,
+        View.OnClickListener,
+        LoaderManager.LoaderCallbacks<List<Event>>,
+        CalendarLoader.CalendarLoadedAuthRequestListener
+{
+
+    //Log tag.
+    private static final String TAG = ConferenceRoomActivity.class.getSimpleName();
+
+    //Request ID for authorization activity.
     private static final int AUTH_REQUEST_ID = 3;
 
+    //Our presenter.
     @Inject
     ConferencePresenter presenter;
-    @Inject
-    CredentialHelper credentialHelper;
 
+    @Inject
+    CredentialHelper creds;
+
+    //View widgets.
     private Button useButton;
     private TextView availabilityTextView;
     private TextView availabilityTimeInfoTextView;
     private TextView dateTextView;
-    private String roomName;
 
-    /**
-     * Create the main activity.
-     *
-     * @param savedInstanceState previously saved instance data.
-     */
+    //Name and ID of the room we're looking at handed in from the login activity.
+    private String roomName;
+    private String roomID;
+
+    //region AppCompatActivity lifecycle methods:
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ConferenceApplication.get(this).component().inject(this);
+
+        //Init room name and ID.
+        roomName = "";
+        roomID = "";
+
+        //Get intent extras.
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            roomName = extras.getString(getString(R.string.room_id_bundle_key));
+
+            //Set room ID and room name.
+            roomName = extras.getString(getString(R.string.room_name_bundle_key));
+            roomID = extras.getString(getString(R.string.room_id_bundle_key));
         }
-        roomName = "Barry";
+
+        //Set main view.
         setContentView(R.layout.activity_conference_room);
+
+        //Set click listener for 'Use' button.
         useButton = (Button) findViewById(R.id.useRoomButton);
         useButton.setOnClickListener(this);
-        availabilityTextView = (TextView) findViewById(R.id.statusText);
-        availabilityTimeInfoTextView = (TextView) findViewById(R.id.timeInfoText);
+
+        //Set room name text.
         TextView roomNameTextView = (TextView) findViewById(R.id.roomNameText);
         roomNameTextView.setText(roomName);
+
+        //Get other text views.
+        availabilityTextView = (TextView) findViewById(R.id.statusText);
+        availabilityTimeInfoTextView = (TextView) findViewById(R.id.timeInfoText);
         dateTextView = (TextView) findViewById(R.id.dateText);
-        setupLoader();
+
+    }
+
+    @Override
+    protected void onStart() {
+        Log.d(TAG, "onStart");
+        super.onStart();
+        presenter.bindView(this);
+        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -83,11 +113,27 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        presenter.bindView(this);
-        Log.d(TAG, "onStart");
+    protected void onStop() {
+        Log.d(TAG, "onStop");
+        super.onStop();
+        //presenter.unbindView();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        switch (resultCode) {
+            case AUTH_REQUEST_ID:
+                loadCalendar();
+                break;
+            default:
+                break;
+        }
+    }
+
+    //endregion
+
+    //region ConferenceView interface:
 
     @Override
     public void showSpinner() {
@@ -125,36 +171,29 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     }
 
     @Override
-    public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.useRoomButton:
-                Intent intent = new Intent(this, EventService.class);
-                intent.putExtra(getString(R.string.room_id_intent_key), getRoomId(roomName));
-                startService(intent);
-                break;
-            default:
-                break;
-        }
+    public void loadCalendar() {
+        getLoaderManager().restartLoader(0, null, this);
     }
 
-    private void setupLoader() {
-        if (credentialHelper.hasValidCredential()) {
-            getLoaderManager().initLoader(0, null, this);
-        } else {
-            //TODO: Tell user their creds are no bueno and return to login
-            Log.d(TAG, "BAD CREDS BRUH");
-        }
-    }
+    //endregion
+
+    //region LoaderManager.LoaderCallbacks interface:
 
     @Override
     public Loader<List<Event>> onCreateLoader(int i, Bundle bundle) {
-        String roomId = getRoomId(roomName);
-        return new CalendarLoader(this, roomId, this);
+
+        //Return a new loader with this context, the API service from our presenter, the
+        //selected roomID, and set this as a listener for the loader.
+        return new CalendarLoader(this, creds.getCalendarService(), roomID, this);
     }
 
     @Override
     public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
+
+        //If we get valid ersults back...
         if (events != null) {
+
+            //log number of envents and hand data down to the presenter.
             Log.d(TAG, "number of events:" + events.size());
             presenter.onEventsLoaded(events);
         }
@@ -166,37 +205,43 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
 
     }
 
-    private String getRoomId(String roomName) {
-        switch (roomName) {
-            case "Cactuar":
-                return CACTUAR_ID;
-            case "Deku":
-                return DEKU_ID;
-            case "Elderberry":
-                return ELDERBERRY_ID;
-            case "Sudowoodo":
-                return SUDOWOODO_ID;
-            case "Barry":
-                return BARRY_ID;
+    //endregion
+
+    //region CalendarLoader.CalendarLoadedAuthRequestListener interface:
+
+    @Override
+    public void onRequestAuth(Intent intent) {
+
+        //Start authorization request activity with the intent.
+        startActivityForResult(intent, AUTH_REQUEST_ID);
+    }
+
+    //endregion
+
+    //region View.onClickListener interface:
+
+    @Override
+    public void onClick(View view) {
+        switch (view.getId()) {
+
+            //'Use Now' button:
+            case R.id.useRoomButton:
+
+                //Create an intent for the event service.
+                Intent intent = new Intent(this, EventService.class);
+
+                //Add our room ID.
+                intent.putExtra(getString(R.string.room_id_bundle_key), roomID);
+
+                //Launch activity.
+                startService(intent);
+                break;
+
             default:
-                throw new Error("WRONG FUCKING ROOM NAME");
+                break;
         }
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode) {
-            case AUTH_REQUEST_ID:
-                setupLoader();
-                break;
-            default:
-                break;
-        }
-    }
+    //endregion
 
-    @Override
-    public void onRequestAuth(Intent intent, int requestId) {
-        startActivityForResult(intent, requestId);
-    }
 }

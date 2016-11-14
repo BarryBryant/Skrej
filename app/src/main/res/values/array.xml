@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <array name="room_names">
+        <item>Cactuar</item>
+        <item>Deku</item>
+        <item>Sudowoodo</item>
+        <item>Elderberry</item>
+
+    </array>
+
+    <array name="room_ids">
+        <item>willowtreeapps.com_3632363436343537393337@resource.calendar.google.com</item>
+        <item>willowtreeapps.com_2d3531383336393730383033@resource.calendar.google.com</item>
+        <item>willowtreeapps.com_2d3331363639303230383838@resource.calendar.google.com</item>
+        <item>willowtreeapps.com_2d3839383537323139333730@resource.calendar.google.com</item>
+
+    </array>
+
+    <array name="room_icons">
+        <item>@mipmap/cactuar_icon</item>
+        <item>@mipmap/deku_icon</item>
+        <item>@mipmap/sudowoodo_icon</item>
+        <item>@mipmap/elderberry_icon</item>
+
+    </array>
+
+</resources>
