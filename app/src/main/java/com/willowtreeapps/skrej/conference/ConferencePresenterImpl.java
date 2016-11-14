@@ -1,13 +1,9 @@
 package com.willowtreeapps.skrej.conference;
 
-import android.app.Activity;
-import android.content.Context;
 import android.util.Log;
 
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.calendar.model.Event;
-import com.willowtreeapps.skrej.CredentialHelper;
-import com.willowtreeapps.skrej.EventTimeUtility;
+import com.willowtreeapps.skrej.util.EventTimeUtility;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -39,18 +35,16 @@ public class ConferencePresenterImpl implements ConferencePresenter {
     @Override
     public void onEventsLoaded(List<Event> events) {
         Log.d(TAG, "Events loaded to presenter");
-        String availability = "";
-        String availabilityTimeInfo = "";
+        String availability;
+        String availabilityTimeInfo;
 
         if(events.size() <= 0) {
-
             availability = "Available";
             availabilityTimeInfo = "All day";
         }
 
         else {
             this.todaysEvents = EventTimeUtility.filterEventsForToday(events);
-
             Event event = events.get(0);
             availability = getRoomAvailability(event);
             availabilityTimeInfo = getRoomAvailabilityTimeInfo(event);
@@ -64,6 +58,7 @@ public class ConferencePresenterImpl implements ConferencePresenter {
 
     @Override
     public void onClickSchedule() {
+
         view.showSpinner();
     }
 

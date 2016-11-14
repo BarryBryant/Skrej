@@ -1,8 +1,7 @@
-package com.willowtreeapps.skrej;
+package com.willowtreeapps.skrej.calendarapi;
 
 import android.Manifest;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -48,7 +47,7 @@ public class CredentialHelper {
     public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String TAG = "ConferencePresenterImpl";
-    private static final String[] SCOPES = {CalendarScopes.CALENDAR_READONLY};
+    private static final String[] SCOPES = { CalendarScopes.CALENDAR };
 
     private GoogleAccountCredential credential;
     private Context context;

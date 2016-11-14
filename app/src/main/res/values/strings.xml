@@ -2,4 +2,5 @@
     <string name="app_name">Skrej</string>
     <string name="credentials_preference_key">credentials</string>
     <string name="room_id_bundle_key">ROOM_KEY</string>
+    <string name="room_id_intent_key">roomIdKey</string>
 </resources>

@@ -3,7 +3,6 @@ package com.willowtreeapps.skrej.login;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -18,7 +17,7 @@ import android.widget.LinearLayout;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.willowtreeapps.skrej.ConferenceApplication;
-import com.willowtreeapps.skrej.CredentialHelper;
+import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 
@@ -28,8 +27,8 @@ import javax.inject.Inject;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
+import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 public class LoginActivity extends AppCompatActivity implements LoginView, EasyPermissions.PermissionCallbacks, View.OnClickListener {
 
@@ -207,7 +206,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }

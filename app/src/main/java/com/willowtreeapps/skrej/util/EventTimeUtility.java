@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej;
+package com.willowtreeapps.skrej.util;
 
 import com.google.api.services.calendar.model.Event;
 

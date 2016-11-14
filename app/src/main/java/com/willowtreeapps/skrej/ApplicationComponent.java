@@ -1,5 +1,7 @@
 package com.willowtreeapps.skrej;
 
+import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
+import com.willowtreeapps.skrej.calendarapi.EventService;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 import com.willowtreeapps.skrej.login.LoginActivity;
 
@@ -19,4 +21,6 @@ public interface ApplicationComponent {
     void inject(ConferenceRoomActivity activity);
 
     void inject(CalendarLoader loader);
+
+    void inject(EventService service);
 }

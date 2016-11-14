@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
@@ -61,6 +62,8 @@ class ApplicationModule {
     public LoginPresenter provideLoginPresenter(@NonNull CredentialHelper credentialHelper) {
         return new LoginPresenterImpl(credentialHelper);
     }
+
+
 
     @Provides
     @NonNull

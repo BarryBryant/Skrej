@@ -1,15 +1,14 @@
 package com.willowtreeapps.skrej.login;
 
-import android.content.Intent;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.willowtreeapps.skrej.CredentialHelper;
+import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 
 import static android.app.Activity.RESULT_OK;
-import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_AUTHORIZATION;
-import static com.willowtreeapps.skrej.CredentialHelper.REQUEST_GOOGLE_PLAY_SERVICES;
+import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_AUTHORIZATION;
+import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_GOOGLE_PLAY_SERVICES;
 
 
 /**

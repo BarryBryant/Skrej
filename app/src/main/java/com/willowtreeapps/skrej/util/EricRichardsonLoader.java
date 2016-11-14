@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej;
+package com.willowtreeapps.skrej.util;
 
 import android.content.AsyncTaskLoader;
 import android.content.Context;
