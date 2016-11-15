@@ -1,24 +1,47 @@
 package com.willowtreeapps.skrej.conference;
 
+import android.content.Intent;
 import android.util.Log;
 
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
+import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
+import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
+import com.willowtreeapps.skrej.calendarapi.RoomAvailabilityStatus;
 import com.willowtreeapps.skrej.util.EventTimeUtility;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by barrybryant on 11/7/16.
  */
 
-public class ConferencePresenterImpl implements ConferencePresenter {
+public class ConferencePresenterImpl
 
-    private static final String TAG = "ConferencePresenterImpl";
+    implements
+    ConferencePresenter
+{
 
+    //Log tag.
+    private static final String TAG = ConferencePresenterImpl.class.getSimpleName();
+
+    //Our view.
     private ConferenceView view;
-    private List<Event> todaysEvents;
+
+    //The calendar wizard.
+    @Inject
+    CalendarWizard calendarWizard;
+
+    public ConferencePresenterImpl(CalendarWizard wizard) {
+        this.calendarWizard = wizard;
+    }
+
+    //region ConferencePresenter interface:
 
     @Override
     public void bindView(ConferenceView view) {
@@ -34,57 +57,33 @@ public class ConferencePresenterImpl implements ConferencePresenter {
 
     @Override
     public void onEventsLoaded(List<Event> events) {
-        Log.d(TAG, "Events loaded to presenter");
-        String availability;
-        String availabilityTimeInfo;
 
-        if(events.size() <= 0) {
-            availability = "Available";
-            availabilityTimeInfo = "All day";
-        }
+        RoomAvailabilityStatus myRoomStat;
 
-        else {
-            this.todaysEvents = EventTimeUtility.filterEventsForToday(events);
-            Event event = events.get(0);
-            availability = getRoomAvailability(event);
-            availabilityTimeInfo = getRoomAvailabilityTimeInfo(event);
-        }
+        //Pass event data down to our wizard.
+        myRoomStat = calendarWizard.parseEventData(events);
 
+        //Update our view with wizard data.
         if (view != null) {
-            view.updateAvailability(availability);
-            view.updateAvailabilityTimeInfo(availabilityTimeInfo);
+
+            view.updateAvailability(myRoomStat.getRoomAvailability());
+            view.updateAvailabilityTimeInfo(myRoomStat.getRoomAvailabilityTimeInfo());
         }
     }
 
     @Override
     public void onClickSchedule() {
 
+        //Show spinner in view.
         view.showSpinner();
     }
+
+    //endregion
 
     private String getFormattedDate() {
         long currentTime = System.currentTimeMillis();
         DateFormat formatter = DateFormat.getDateInstance(DateFormat.LONG);
         return formatter.format(currentTime);
-
-    }
-
-    private String getRoomAvailability(Event event) {
-        if (event.getStart().getDateTime().getValue() > System.currentTimeMillis()) {
-            return "Available";
-        } else {
-            return event.getSummary();
-        }
-    }
-
-    private String getRoomAvailabilityTimeInfo(Event event) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("h:mm a");
-        if (event.getStart().getDateTime().getValue() > System.currentTimeMillis()) {
-            return "Until " + simpleDateFormat.format(event.getStart().getDateTime().getValue());
-        } else {
-            return simpleDateFormat.format(event.getStart().getDateTime().getValue()) + " - " +
-                    simpleDateFormat.format(event.getEnd().getDateTime().getValue());
-        }
     }
 
 }

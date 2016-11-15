@@ -4,6 +4,7 @@ import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -33,11 +34,10 @@ import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_PERM
 public class LoginActivity extends AppCompatActivity implements LoginView, EasyPermissions.PermissionCallbacks, View.OnClickListener {
 
     //Tag for logging.
-    private static final String TAG = "Login activity";
-    private static final int CACTUAR = 100;
-    private static final int DEKU = 101;
-    private static final int SUDOWOODO = 102;
-    private static final int ELDERBERRY = 103;
+    private static final String TAG = LoginActivity.class.getSimpleName();
+
+
+    private static final int room_id_key = 100;
 
     //The presenter for this view.
     @Inject
@@ -51,15 +51,18 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
         super.onCreate(savedInstanceState);
         ConferenceApplication.get(this).component().inject(this);
         setContentView(R.layout.activity_login);
-        Drawable cactuarIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.cactuar_icon, null);
-        addRoomToList("Cactuar", cactuarIcon, CACTUAR);
-        Drawable dekuIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.deku_icon, null);
-        addRoomToList("Deku", dekuIcon, DEKU);
-        Drawable sudowoodoIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.sudowoodo_icon, null);
-        addRoomToList("Sudowoodo", sudowoodoIcon, SUDOWOODO);
-        Drawable elderberryIcon = ResourcesCompat.getDrawable(getResources(), R.mipmap.elderberry_icon, null);
-        addRoomToList("Elderberry", elderberryIcon, ELDERBERRY);
-        //Set up waiting dialog.
+
+
+        TypedArray roomIcons = getResources().obtainTypedArray(R.array.room_icons);
+        final String[] roomNames = getResources().getStringArray(R.array.room_names);
+
+        for(int loopX = 0; loopX < roomIcons.length(); loopX++) {
+
+            Drawable roomIcon = ResourcesCompat.getDrawable(getResources(), roomIcons.getResourceId(loopX, -1), null);
+            addRoomToList(roomNames[loopX], roomIcon, (room_id_key + loopX));
+
+
+        }
     }
 
     /**
@@ -212,29 +215,16 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
 
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case CACTUAR:
-                Intent cactuarIntent = new Intent(this, ConferenceRoomActivity.class);
-                cactuarIntent.putExtra(getString(R.string.room_id_bundle_key), "Cactuar");
-                startActivity(cactuarIntent);
-                break;
-            case DEKU:
-                Intent dekuIntent = new Intent(this, ConferenceRoomActivity.class);
-                dekuIntent.putExtra(getString(R.string.room_id_bundle_key), "Deku");
-                startActivity(dekuIntent);
-                break;
-            case SUDOWOODO:
-                Intent sudowoodoIntent = new Intent(this, ConferenceRoomActivity.class);
-                sudowoodoIntent.putExtra(getString(R.string.room_id_bundle_key), "Sudowoodo");
-                startActivity(sudowoodoIntent);
-                break;
-            case ELDERBERRY:
-                Intent elderberryIntent = new Intent(this, ConferenceRoomActivity.class);
-                elderberryIntent.putExtra(getString(R.string.room_id_bundle_key), "Elderberry");
-                startActivity(elderberryIntent);
-                break;
-            default:
-                break;
-        }
+
+        int id_index = view.getId() - room_id_key;
+        final String[] roomIDs = getResources().getStringArray(R.array.room_ids);
+        final String[] roomNames = getResources().getStringArray(R.array.room_names);
+
+        Intent conferenceIntent = new Intent(this, ConferenceRoomActivity.class);
+        conferenceIntent.putExtra(getString(R.string.room_id_bundle_key), roomIDs[id_index]);
+        conferenceIntent.putExtra(getString(R.string.room_name_bundle_key), roomNames[id_index]);
+        startActivity(conferenceIntent);
+
+
     }
 }

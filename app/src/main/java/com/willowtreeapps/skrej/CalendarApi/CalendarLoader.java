@@ -2,10 +2,12 @@ package com.willowtreeapps.skrej.calendarapi;
 
 import android.content.Context;
 import android.content.Intent;
+import android.text.format.DateUtils;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.google.api.client.util.DateTime;
+import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.Events;
 import com.willowtreeapps.skrej.ConferenceApplication;
@@ -16,33 +18,41 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import dagger.Component;
+
 /**
  * Created by barrybryant on 11/8/16.
  */
 
 public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
 
+    //Interface defines a callback to request user authorization if our API query fails.
     public interface CalendarLoadedAuthRequestListener {
-        void onRequestAuth(Intent intent, int requestId);
+        void onRequestAuth(Intent intent);
     }
 
-    @Inject
-    CredentialHelper credentialHelper;
+    //Log tag.
+    private static final String TAG = CalendarLoader.class.getSimpleName();
 
-    private static final String TAG = "CalendarLoader";
-    private static final int AUTH_REQUEST_ID = 3;
-
-    private com.google.api.services.calendar.Calendar service;
-    private Exception lastError;
+    //The ID of the room we want to query.
     private String roomId;
-    CalendarLoadedAuthRequestListener listener;
 
-    public CalendarLoader(Context context, String roomId, CalendarLoadedAuthRequestListener listener) {
+    //Authorization request listener instance.
+    private CalendarLoadedAuthRequestListener listener;
+
+    //Calendar service object.
+    private Calendar service;
+
+    public CalendarLoader(
+        Context context,
+        Calendar service,
+        String roomID,
+        CalendarLoadedAuthRequestListener authRequestListener
+    ) {
         super(context);
-        ConferenceApplication.get(context.getApplicationContext()).component().inject(this);
-        this.roomId = roomId;
-        this.listener = listener;
-        service = credentialHelper.getCalendarService();
+        this.service = service;
+        this.roomId = roomID;
+        this.listener = authRequestListener;
     }
 
     @Override
@@ -50,7 +60,7 @@ public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
         try {
             return getDataFromApi();
         } catch (UserRecoverableAuthIOException e) {
-            listener.onRequestAuth(e.getIntent(), AUTH_REQUEST_ID);
+            listener.onRequestAuth(e.getIntent());
         } catch (Exception e) {
             Log.d(TAG, e.toString());
         }
@@ -58,14 +68,28 @@ public class CalendarLoader extends EricRichardsonLoader<List<Event>> {
     }
 
     private List<Event> getDataFromApi() throws IOException {
-        // List the next 10 events from the primary calendar.
-        DateTime now = new DateTime(System.currentTimeMillis());
-        Events events = service.events().list(roomId)
+
+        //Current time in ms.
+        long nowTimeMillis = System.currentTimeMillis();
+
+        //Midnight in ms.
+        long midnightTimeMillis = nowTimeMillis + (nowTimeMillis % DateUtils.DAY_IN_MILLIS);
+
+        //Now and midnight as DateTime.
+        DateTime nowTime = new DateTime(nowTimeMillis);
+        DateTime midnightTime = new DateTime(midnightTimeMillis);
+
+        //Get no more than ten events between now and midnight tonight, ordered by start time.
+        Events events = service.events()
+                .list(roomId)
                 .setMaxResults(10)
-                .setTimeMin(now)
+                .setTimeMin(nowTime)
+                .setTimeMax(midnightTime)
                 .setOrderBy("startTime")
                 .setSingleEvents(true)
                 .execute();
+
+        //Return event list.
         return events.getItems();
     }
 }

@@ -5,12 +5,14 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
+import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
 import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
 import com.willowtreeapps.skrej.login.LoginPresenterImpl;
 
+import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -64,11 +66,17 @@ class ApplicationModule {
     }
 
 
+    @Provides
+    @Nonnull
+    public CalendarWizard provideCalendarServiceWizard() {
+        return new CalendarWizard();
+    }
+
 
     @Provides
     @NonNull
-    public ConferencePresenter provideConferencePresenter() {
-        return new ConferencePresenterImpl();
+    public ConferencePresenter provideConferencePresenter(@Nonnull CalendarWizard wizard) {
+        return new ConferencePresenterImpl(wizard);
     }
 
 }
