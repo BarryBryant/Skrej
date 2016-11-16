@@ -2,9 +2,7 @@ package com.willowtreeapps.skrej;
 
 import android.app.Application;
 import android.content.Context;
-import android.content.res.Resources;
 import android.support.annotation.NonNull;
-import android.telecom.Conference;
 
 /**
  * Created by barrybryant on 11/10/16.

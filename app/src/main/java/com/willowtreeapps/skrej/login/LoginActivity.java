@@ -18,8 +18,8 @@ import android.widget.LinearLayout;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.willowtreeapps.skrej.ConferenceApplication;
-import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.R;
+import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 
 import java.util.List;
@@ -52,17 +52,14 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
         ConferenceApplication.get(this).component().inject(this);
         setContentView(R.layout.activity_login);
 
-
         TypedArray roomIcons = getResources().obtainTypedArray(R.array.room_icons);
         final String[] roomNames = getResources().getStringArray(R.array.room_names);
 
-        for(int loopX = 0; loopX < roomIcons.length(); loopX++) {
-
+        for (int loopX = 0; loopX < roomIcons.length(); loopX++) {
             Drawable roomIcon = ResourcesCompat.getDrawable(getResources(), roomIcons.getResourceId(loopX, -1), null);
             addRoomToList(roomNames[loopX], roomIcon, (room_id_key + loopX));
-
-
         }
+        roomIcons.recycle();
     }
 
     /**
@@ -137,7 +134,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
      */
     @Override
     public void showLoading() {
-        
+
     }
 
     @Override

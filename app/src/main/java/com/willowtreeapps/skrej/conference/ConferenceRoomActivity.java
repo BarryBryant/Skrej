@@ -1,34 +1,32 @@
 package com.willowtreeapps.skrej.conference;
 
 import android.app.LoaderManager;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.Loader;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
 import com.google.api.services.calendar.model.Event;
-import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
+import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
 import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.calendarapi.EventService;
+import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
+
 import java.util.List;
+
 import javax.inject.Inject;
 
-public class ConferenceRoomActivity
-
-        extends
-        AppCompatActivity
-
-        implements
-        ConferenceView,
-        View.OnClickListener,
-        LoaderManager.LoaderCallbacks<List<Event>>,
-        CalendarLoader.CalendarLoadedAuthRequestListener
-{
+public class ConferenceRoomActivity extends AppCompatActivity implements ConferenceView,
+        View.OnClickListener, LoaderManager.LoaderCallbacks<List<Event>>,
+        CalendarLoader.CalendarLoadedAuthRequestListener {
 
     //Log tag.
     private static final String TAG = ConferenceRoomActivity.class.getSimpleName();
@@ -161,18 +159,47 @@ public class ConferenceRoomActivity
     }
 
     @Override
-    public void enableScheduleButton() {
-
-    }
+    public void enableScheduleButton() {}
 
     @Override
-    public void disableScheduleButton() {
-
-    }
+    public void disableScheduleButton() {}
 
     @Override
     public void loadCalendar() {
         getLoaderManager().restartLoader(0, null, this);
+    }
+
+    @Override
+    public void createEventPrompt(final RoomAvailabilityStatus roomStatus) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        int numOfBlocks = roomStatus.getAvailableBlocks();
+        builder.setTitle("Set meeting duration");
+        String[] types = new String[numOfBlocks];
+        for (int i = 0; i < numOfBlocks; i ++) {
+            types[i] = ((i+1) * 15) + " Minutes";
+            Log.d(TAG, types[i]);
+        }
+        builder.setItems(types, new DialogInterface.OnClickListener() {
+
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                int chosenNumOfBlocks = which + 1;
+                createEvent(chosenNumOfBlocks);
+            }
+
+        });
+
+        builder.show();
+    }
+
+    private void createEvent(int chosenNumOfBlocks) {
+        //Create an intent for the event service.
+        Intent intent = new Intent(this, EventService.class);
+        //Add our room ID.
+        intent.putExtra(getString(R.string.room_id_bundle_key), roomID);
+        intent.putExtra(getString(R.string.num_of_blocks_intent_key), chosenNumOfBlocks);
+        //Launch activity.
+        startService(intent);
     }
 
     //endregion
@@ -189,7 +216,6 @@ public class ConferenceRoomActivity
 
     @Override
     public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
-
         //If we get valid ersults back...
         if (events != null) {
 
@@ -201,9 +227,7 @@ public class ConferenceRoomActivity
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Event>> loader) {
-
-    }
+    public void onLoaderReset(Loader<List<Event>> loader) {}
 
     //endregion
 
@@ -211,7 +235,6 @@ public class ConferenceRoomActivity
 
     @Override
     public void onRequestAuth(Intent intent) {
-
         //Start authorization request activity with the intent.
         startActivityForResult(intent, AUTH_REQUEST_ID);
     }
@@ -223,20 +246,10 @@ public class ConferenceRoomActivity
     @Override
     public void onClick(View view) {
         switch (view.getId()) {
-
             //'Use Now' button:
             case R.id.useRoomButton:
-
-                //Create an intent for the event service.
-                Intent intent = new Intent(this, EventService.class);
-
-                //Add our room ID.
-                intent.putExtra(getString(R.string.room_id_bundle_key), roomID);
-
-                //Launch activity.
-                startService(intent);
+                presenter.onClickSchedule();
                 break;
-
             default:
                 break;
         }
