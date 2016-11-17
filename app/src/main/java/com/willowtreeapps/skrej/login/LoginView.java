@@ -1,5 +1,8 @@
 package com.willowtreeapps.skrej.login;
 
+import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
+
 /**
  * Created by chrisestes on 11/9/16.
  */
@@ -17,4 +20,10 @@ public interface LoginView {
     void showUserPermissionsDialog();
 
     void showAccountPicker();
+
+    void onReceiveValidCredentials();
+
+    void disableRoomButtons();
+
+    void enableRoomButtons();
 }

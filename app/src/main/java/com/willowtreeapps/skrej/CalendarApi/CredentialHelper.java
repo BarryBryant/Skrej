@@ -15,6 +15,8 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
+import com.google.api.services.admin.directory.Directory;
+import com.google.api.services.admin.directory.DirectoryScopes;
 import com.google.api.services.calendar.CalendarScopes;
 
 import java.util.Arrays;
@@ -29,17 +31,31 @@ import pub.devrel.easypermissions.EasyPermissions;
 public class CredentialHelper {
 
 
+    public interface CredentialListener {
+        void onReceiveValidCredentials(GoogleAccountCredential credential);
+
+        void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode);
+
+        void networkUnavailable();
+
+        void requestAccountPicker();
+
+        void requestPermissions();
+    }
+
     public static final int REQUEST_ACCOUNT_PICKER = 1000;
     public static final int REQUEST_AUTHORIZATION = 1001;
     public static final int REQUEST_GOOGLE_PLAY_SERVICES = 1002;
     public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String TAG = "ConferencePresenterImpl";
-    private static final String[] SCOPES = {CalendarScopes.CALENDAR};
+    private static final String[] SCOPES = { CalendarScopes.CALENDAR, DirectoryScopes.ADMIN_DIRECTORY_USER_READONLY};
+
     private GoogleAccountCredential credential;
     private Context context;
     private SharedPreferences preferences;
     private CredentialListener listener;
+
     public CredentialHelper(Context context, SharedPreferences preferences) {
         this.context = context;
         this.preferences = preferences;
@@ -112,6 +128,28 @@ public class CredentialHelper {
         } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
     }
 
+    public com.google.api.services.admin.directory.Directory getDirectoryService() {
+        if (hasValidCredential()) {
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            return new com.google.api.services.admin.directory.Directory.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Directory API Android Quickstart")
+                    .build();
+        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
+    }
+
+    public com.google.api.services.people.v1.People getPeopleService() {
+        if (hasValidCredential()) {
+            HttpTransport transport = AndroidHttp.newCompatibleTransport();
+            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
+            return new com.google.api.services.people.v1.People.Builder(
+                    transport, jsonFactory, credential)
+                    .setApplicationName("Google Calendar API Android Quickstart")
+                    .build();
+        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
+    }
+
     /**
      * Attempts to set the account used with the API credentials. If an account
      * name was previously saved it will use that one; otherwise an account
@@ -177,17 +215,5 @@ public class CredentialHelper {
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
         return (networkInfo != null && networkInfo.isConnected());
-    }
-
-    public interface CredentialListener {
-        void onReceiveValidCredentials(GoogleAccountCredential credential);
-
-        void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode);
-
-        void networkUnavailable();
-
-        void requestAccountPicker();
-
-        void requestPermissions();
     }
 }

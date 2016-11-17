@@ -3,7 +3,10 @@ package com.willowtreeapps.skrej.login;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
+import com.google.api.services.admin.directory.model.User;
 import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
+
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
 import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_ACCOUNT_PICKER;
@@ -24,6 +27,8 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
     //Class to get credentials.
     private CredentialHelper credentialHelper;
 
+    private boolean contactsLoaded = false;
+
     //View instance.
     private LoginView view;
 
@@ -38,9 +43,15 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
     @Override
     public void bindView(LoginView view) {
         this.view = view;
-        this.view.showLoading();
         //Start running credential helper on bind view.
-        this.credentialHelper.getValidCredential();
+        if (!credentialHelper.hasValidCredential() || !contactsLoaded) {
+            this.credentialHelper.getValidCredential();
+            this.view.showLoading();
+            this.view.disableRoomButtons();
+        } else {
+            this.view.hideLoading();
+            this.view.enableRoomButtons();
+        }
     }
 
     @Override
@@ -77,6 +88,14 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
         }
     }
 
+    @Override
+    public void onContactsLoaded(List<User> contacts) {
+        contactsLoaded = true;
+        view.hideLoading();
+        view.enableRoomButtons();
+        Log.d(TAG, "******CONTACTSLOADED*********" + contacts.size());
+    }
+
     /**
      * We have valid credentials now and we can show the list of rooms.
      *
@@ -86,21 +105,22 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
     public void onReceiveValidCredentials(GoogleAccountCredential credential) {
         if (view != null) {
             //Hide our waiting dialog.
-            view.hideLoading();
+            view.onReceiveValidCredentials();
         }
     }
 
     @Override
     public void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode) {
         if (view != null) {
-            view.hideLoading();
             view.showPlayServicesErrorDialog(connectionStatusCode, requestCode);
+            view.hideLoading();
         }
     }
 
     @Override
     public void networkUnavailable() {
         if (view != null) {
+            view.hideLoading();
             view.showErrorDialog("Network is unavailable");
         }
     }
