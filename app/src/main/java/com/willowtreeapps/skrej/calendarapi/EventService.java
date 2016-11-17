@@ -12,10 +12,11 @@ import com.google.api.services.calendar.model.EventAttendee;
 import com.google.api.services.calendar.model.EventDateTime;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
-import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -33,7 +34,7 @@ public class EventService extends IntentService {
     private static final String TAG = "EventService";
 
     @Inject
-    CredentialHelper credentialHelper;
+    CredentialWizard credentialWizard;
 
     private com.google.api.services.calendar.Calendar service;
 
@@ -45,23 +46,24 @@ public class EventService extends IntentService {
     public void onCreate() {
         super.onCreate();
         ConferenceApplication.get(getApplicationContext()).component().inject(this);
-        service = credentialHelper.getCalendarService();
+        service = credentialWizard.getCalendarService();
     }
 
     @Override
     protected void onHandleIntent(Intent intent) {
         String roomId = intent.getStringExtra(getString(R.string.room_id_bundle_key));
         int numOfBlocks = intent.getIntExtra(getString(R.string.num_of_blocks_intent_key), 1);
+        ArrayList<String> attendees = intent.getStringArrayListExtra("attendeesKey");
         //create receiver notify of start download
         try {
-            createEvent(roomId, numOfBlocks);
+            createEvent(roomId, numOfBlocks, attendees);
         } catch (Exception e) {
             //send error message
             Log.d(TAG, e.getMessage());
         }
     }
 
-    private void createEvent(String roomId, int numOfBlocks) throws IOException {
+    private void createEvent(String roomId, int numOfBlocks, List<String> attendees) throws IOException {
         Event event = new Event()
                 .setSummary("Ad Hoc Meeting")
                 .setDescription("Ad Hoc Meeting");
@@ -71,10 +73,12 @@ public class EventService extends IntentService {
         EventDateTime end = new EventDateTime().setDateTime(endDateTime);
         event.setStart(start);
         event.setEnd(end);
-        EventAttendee[] attendees = new EventAttendee[]{
-                new EventAttendee().setEmail(roomId)
-        };
-        event.setAttendees(Arrays.asList(attendees));
+        List<EventAttendee> eventAttendees = new ArrayList<>();
+        eventAttendees.add(new EventAttendee().setEmail(roomId));
+        for (String attendee : attendees) {
+            eventAttendees.add(new EventAttendee().setEmail(attendee));
+        }
+        event.setAttendees(eventAttendees);
         SharedPreferences preferences = getSharedPreferences(getString(R.string.credentials_preference_key), Context.MODE_PRIVATE);
         String accountId = preferences.getString(PREF_ACCOUNT_NAME, null);
         if (accountId == null) {

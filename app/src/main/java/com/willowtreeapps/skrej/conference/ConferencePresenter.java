@@ -18,5 +18,7 @@ public interface ConferencePresenter {
 
     void onClickSchedule();
 
+    void onNumOfBlocksChosen(int chosenNumOfBlocks);
 
+    void onAttendeesSelected(List<String> attendees);
 }

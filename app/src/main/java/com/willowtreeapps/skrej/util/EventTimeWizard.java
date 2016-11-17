@@ -9,7 +9,7 @@ import java.util.List;
  * Created by barrybryant on 11/9/16.
  */
 
-public class EventTimeUtility {
+public class EventTimeWizard {
 
     public static List<Event> filterEventsForToday(List<Event> events) {
         //TODO: Beware all day events may not have time, account for dat

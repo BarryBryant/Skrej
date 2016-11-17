@@ -6,11 +6,12 @@ import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
 import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
-import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
+import com.willowtreeapps.skrej.calendarapi.CredentialWizard;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
 import com.willowtreeapps.skrej.login.LoginPresenterImpl;
+import com.willowtreeapps.skrej.realm.RealmWizard;
 
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
@@ -55,14 +56,21 @@ class ApplicationModule {
     @Provides
     @NonNull
     @Singleton
-    public CredentialHelper provideCredentialHelper(@NonNull Context context, @NonNull SharedPreferences preferences) {
-        return new CredentialHelper(context, preferences);
+    public CredentialWizard provideCredentialHelper(@NonNull Context context, @NonNull SharedPreferences preferences) {
+        return new CredentialWizard(context, preferences);
     }
 
     @Provides
     @NonNull
-    public LoginPresenter provideLoginPresenter(@NonNull CredentialHelper credentialHelper) {
-        return new LoginPresenterImpl(credentialHelper);
+    @Singleton
+    public RealmWizard provideRealmWizard() {
+        return new RealmWizard();
+    }
+
+    @Provides
+    @NonNull
+    public LoginPresenter provideLoginPresenter(@NonNull CredentialWizard credentialWizard, @NonNull RealmWizard realmWizard) {
+        return new LoginPresenterImpl(credentialWizard, realmWizard);
     }
 
 

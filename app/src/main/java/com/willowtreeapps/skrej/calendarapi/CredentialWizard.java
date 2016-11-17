@@ -28,7 +28,7 @@ import pub.devrel.easypermissions.EasyPermissions;
  * Created by barrybryant on 11/8/16.
  */
 
-public class CredentialHelper {
+public class CredentialWizard {
 
 
     public interface CredentialListener {
@@ -56,7 +56,7 @@ public class CredentialHelper {
     private SharedPreferences preferences;
     private CredentialListener listener;
 
-    public CredentialHelper(Context context, SharedPreferences preferences) {
+    public CredentialWizard(Context context, SharedPreferences preferences) {
         this.context = context;
         this.preferences = preferences;
         credential = GoogleAccountCredential.usingOAuth2(

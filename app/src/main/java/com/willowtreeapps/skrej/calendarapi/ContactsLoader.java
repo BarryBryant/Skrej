@@ -23,7 +23,7 @@ public class ContactsLoader extends EricRichardsonLoader<List<User>> {
     private static final String TAG = CalendarLoader.class.getSimpleName();
     //Authorization request listener instance.
     private CredentialAuthRequestListener listener;
-    //Calendar service object.
+    //Calendar service object.z
     private Directory service;
 
     public ContactsLoader(Context context,

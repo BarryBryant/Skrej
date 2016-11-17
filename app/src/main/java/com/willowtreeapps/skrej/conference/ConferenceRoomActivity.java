@@ -1,5 +1,6 @@
 package com.willowtreeapps.skrej.conference;
 
+import android.app.FragmentManager;
 import android.app.LoaderManager;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -16,17 +17,20 @@ import com.google.api.services.calendar.model.Event;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
-import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
+import com.willowtreeapps.skrej.calendarapi.CredentialWizard;
 import com.willowtreeapps.skrej.calendarapi.EventService;
+import com.willowtreeapps.skrej.model.RealmUser;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 public class ConferenceRoomActivity extends AppCompatActivity implements ConferenceView,
         View.OnClickListener, LoaderManager.LoaderCallbacks<List<Event>>,
-        CalendarLoader.CalendarLoadedAuthRequestListener {
+        CalendarLoader.CalendarLoadedAuthRequestListener,
+        AttendeeDialogFragment.AttendeeSelectedListener {
 
     //Log tag.
     private static final String TAG = ConferenceRoomActivity.class.getSimpleName();
@@ -39,7 +43,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     ConferencePresenter presenter;
 
     @Inject
-    CredentialHelper creds;
+    CredentialWizard creds;
 
     //View widgets.
     private Button useButton;
@@ -170,7 +174,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     }
 
     @Override
-    public void createEventPrompt(final RoomAvailabilityStatus roomStatus) {
+    public void showEventDurationPrompt(final RoomAvailabilityStatus roomStatus) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         int numOfBlocks = roomStatus.getAvailableBlocks();
         builder.setTitle("Set meeting duration");
@@ -184,7 +188,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 int chosenNumOfBlocks = which + 1;
-                createEvent(chosenNumOfBlocks);
+                presenter.onNumOfBlocksChosen(chosenNumOfBlocks);
             }
 
         });
@@ -192,14 +196,26 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         builder.show();
     }
 
-    private void createEvent(int chosenNumOfBlocks) {
+    @Override
+    public void showEventAttendeesPrompt() {
+        AttendeeDialogFragment dialog = AttendeeDialogFragment.getInstance();
+        FragmentManager fragmentManager = getFragmentManager();
+        dialog.show(fragmentManager, "attendee_fragment");
+
+    }
+
+    @Override
+    public void createEvent(int chosenNumOfBlocks, List<String> attendees) {
         //Create an intent for the event service.
         Intent intent = new Intent(this, EventService.class);
         //Add our room ID.
         intent.putExtra(getString(R.string.room_id_bundle_key), roomID);
         intent.putExtra(getString(R.string.num_of_blocks_intent_key), chosenNumOfBlocks);
+        ArrayList<String> attendeesList = new ArrayList<>(attendees);
+        intent.putStringArrayListExtra("attendeesKey", attendeesList);
         //Launch activity.
         startService(intent);
+        Log.d(TAG, "Num of blocks: " + chosenNumOfBlocks + "num of attendees: " + attendees.size());
     }
 
     //endregion
@@ -253,6 +269,11 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
             default:
                 break;
         }
+    }
+
+    @Override
+    public void onAttendeesSelected(List<String> attendees) {
+        presenter.onAttendeesSelected(attendees);
     }
 
     //endregion

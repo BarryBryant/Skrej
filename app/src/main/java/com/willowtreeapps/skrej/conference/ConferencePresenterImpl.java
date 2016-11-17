@@ -23,6 +23,7 @@ public class ConferencePresenterImpl implements ConferencePresenter {
     //Our view.
     private ConferenceView view;
     private List<Event> events;
+    private int chosenNumOfBlocks;
 
     public ConferencePresenterImpl(CalendarWizard wizard) {
         this.calendarWizard = wizard;
@@ -61,7 +62,18 @@ public class ConferencePresenterImpl implements ConferencePresenter {
         //Show spinner in view.
         view.showSpinner();
         RoomAvailabilityStatus roomStatus = calendarWizard.parseFirstEvent(events);
-        view.createEventPrompt(roomStatus);
+        view.showEventDurationPrompt(roomStatus);
+    }
+
+    @Override
+    public void onNumOfBlocksChosen(int chosenNumOfBlocks) {
+        this.chosenNumOfBlocks = chosenNumOfBlocks;
+        view.showEventAttendeesPrompt();
+    }
+
+    @Override
+    public void onAttendeesSelected(List<String> attendees) {
+        view.createEvent(chosenNumOfBlocks, attendees);
     }
 
     //endregion

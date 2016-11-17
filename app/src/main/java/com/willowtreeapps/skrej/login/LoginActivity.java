@@ -20,13 +20,11 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.admin.directory.model.User;
-import com.google.api.services.calendar.model.Event;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.calendarapi.ContactsLoader;
-import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
+import com.willowtreeapps.skrej.calendarapi.CredentialWizard;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 
 import java.util.ArrayList;
@@ -36,8 +34,8 @@ import javax.inject.Inject;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
+import static com.willowtreeapps.skrej.calendarapi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarapi.CredentialWizard.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 public class LoginActivity extends AppCompatActivity implements LoginView, 
         EasyPermissions.PermissionCallbacks, View.OnClickListener,
@@ -58,7 +56,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     LoginPresenter presenter;
     
     @Inject
-    CredentialHelper credentialHelper;
+    CredentialWizard credentialWizard;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,6 +76,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
         if (getLastCustomNonConfigurationInstance() != null) {
             presenter = (LoginPresenter) getLastCustomNonConfigurationInstance();
         }
+
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
     }
 
@@ -181,7 +180,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
 
     @Override
     public void showAccountPicker() {
-        startActivityForResult(credentialHelper.getCredential().newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+        startActivityForResult(credentialWizard.getCredential().newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
     }
 
     @Override
@@ -273,7 +272,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
 
     @Override
     public Loader<List<User>> onCreateLoader(int i, Bundle bundle) {
-        return new ContactsLoader(this, credentialHelper.getDirectoryService(), this);
+        return new ContactsLoader(this, credentialWizard.getDirectoryService(), this);
     }
 
     @Override

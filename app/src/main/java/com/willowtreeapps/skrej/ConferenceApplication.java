@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import io.realm.Realm;
+
 /**
  * Created by barrybryant on 11/10/16.
  */
@@ -20,6 +22,7 @@ public class ConferenceApplication extends Application {
     public void onCreate() {
         super.onCreate();
         component = buildComponent();
+        Realm.init(this);
     }
 
 
