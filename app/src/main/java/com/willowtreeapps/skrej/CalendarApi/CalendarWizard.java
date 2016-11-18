@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej.calendarapi;
+package com.willowtreeapps.skrej.calendarApi;
 
 import android.text.format.DateUtils;
 

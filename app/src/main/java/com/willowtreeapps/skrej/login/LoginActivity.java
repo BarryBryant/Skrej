@@ -23,8 +23,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.services.admin.directory.model.User;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
-import com.willowtreeapps.skrej.calendarapi.ContactsLoader;
-import com.willowtreeapps.skrej.calendarapi.CredentialWizard;
+import com.willowtreeapps.skrej.calendarApi.ContactsLoader;
+import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 
 import java.util.ArrayList;
@@ -34,8 +34,8 @@ import javax.inject.Inject;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.willowtreeapps.skrej.calendarapi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.calendarapi.CredentialWizard.REQUEST_PERMISSION_GET_ACCOUNTS;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 public class LoginActivity extends AppCompatActivity implements LoginView, 
         EasyPermissions.PermissionCallbacks, View.OnClickListener,

@@ -1,5 +1,8 @@
 package com.willowtreeapps.skrej.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by barrybryant on 11/17/16.
  */
@@ -30,5 +33,18 @@ public class Attendee {
 
     public void setChecked(boolean checked) {
         isChecked = checked;
+    }
+
+    public static List<Attendee> filter(List<Attendee> attendees, String query) {
+        final String lowerCaseQuery = query.toLowerCase();
+
+        final List<Attendee> filteredAttendees = new ArrayList<>();
+        for (Attendee attendee : attendees) {
+            final String name = attendee.getName().toLowerCase();
+            if(name.contains(lowerCaseQuery)) {
+                filteredAttendees.add(attendee);
+            }
+        }
+        return filteredAttendees;
     }
 }

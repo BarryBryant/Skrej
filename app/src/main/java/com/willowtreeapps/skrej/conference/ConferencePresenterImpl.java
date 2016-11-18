@@ -1,7 +1,7 @@
 package com.willowtreeapps.skrej.conference;
 
 import com.google.api.services.calendar.model.Event;
-import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
+import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import java.text.DateFormat;

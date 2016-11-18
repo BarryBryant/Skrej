@@ -4,15 +4,15 @@ import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.services.admin.directory.model.User;
-import com.willowtreeapps.skrej.calendarapi.CredentialWizard;
+import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.realm.RealmWizard;
 
 import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
-import static com.willowtreeapps.skrej.calendarapi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.calendarapi.CredentialWizard.REQUEST_AUTHORIZATION;
-import static com.willowtreeapps.skrej.calendarapi.CredentialWizard.REQUEST_GOOGLE_PLAY_SERVICES;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_AUTHORIZATION;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_GOOGLE_PLAY_SERVICES;
 
 
 /**

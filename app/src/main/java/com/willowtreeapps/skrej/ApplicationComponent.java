@@ -1,8 +1,9 @@
 package com.willowtreeapps.skrej;
 
-import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
-import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
-import com.willowtreeapps.skrej.calendarapi.EventService;
+import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogFragment;
+import com.willowtreeapps.skrej.calendarApi.CalendarLoader;
+import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
+import com.willowtreeapps.skrej.calendarApi.EventService;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 import com.willowtreeapps.skrej.login.LoginActivity;
 
@@ -26,4 +27,6 @@ public interface ApplicationComponent {
     void inject(CalendarLoader loader);
 
     void inject(EventService service);
+
+    void inject(AttendeeDialogFragment fragment);
 }

@@ -5,6 +5,7 @@ import com.willowtreeapps.skrej.model.Attendee;
 import com.willowtreeapps.skrej.model.RealmUser;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 import io.realm.Realm;
@@ -37,6 +38,7 @@ public class RealmWizard {
         Realm realm = Realm.getDefaultInstance();
         RealmQuery<RealmUser> query = realm.where(RealmUser.class);
         RealmResults<RealmUser> results = query.findAll();
+        results = results.sort("name");
         ArrayList<Attendee> attendees = new ArrayList<>();
         for (RealmUser user : results) {
             attendees.add(new Attendee(user.getName(), user.getEmail()));

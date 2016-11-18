@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej.calendarapi;
+package com.willowtreeapps.skrej.calendarApi;
 
 import android.app.IntentService;
 import android.content.Context;
@@ -15,7 +15,6 @@ import com.willowtreeapps.skrej.R;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;

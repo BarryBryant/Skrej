@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej.calendarapi;
+package com.willowtreeapps.skrej.calendarApi;
 
 import android.Manifest;
 import android.content.Context;
@@ -15,7 +15,6 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.ExponentialBackOff;
-import com.google.api.services.admin.directory.Directory;
 import com.google.api.services.admin.directory.DirectoryScopes;
 import com.google.api.services.calendar.CalendarScopes;
 

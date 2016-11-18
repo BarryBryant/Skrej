@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 
-import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
-import com.willowtreeapps.skrej.calendarapi.CredentialWizard;
+import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenter;
+import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenterImpl;
+import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
+import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
@@ -85,6 +87,12 @@ class ApplicationModule {
     @NonNull
     public ConferencePresenter provideConferencePresenter(@Nonnull CalendarWizard wizard) {
         return new ConferencePresenterImpl(wizard);
+    }
+
+    @Provides
+    @NonNull
+    public AttendeeDialogPresenter providesAttendeeDialogPresenter() {
+        return new AttendeeDialogPresenterImpl();
     }
 
 }

@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej.conference;
+package com.willowtreeapps.skrej.attendeeSelection;
 
 
 import android.app.DialogFragment;
@@ -15,28 +15,29 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 
+import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.adapter.AttendeeAdapter;
 import com.willowtreeapps.skrej.adapter.AttendeeCheckedListener;
 import com.willowtreeapps.skrej.model.Attendee;
-import com.willowtreeapps.skrej.model.RealmUser;
-import com.willowtreeapps.skrej.realm.RealmWizard;
 
-import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
 
 /**
  * Created by barrybryant on 11/17/16.
  */
 
-public class AttendeeDialogFragment extends DialogFragment implements AttendeeCheckedListener, View.OnClickListener, TextWatcher {
+public class AttendeeDialogFragment extends DialogFragment implements View.OnClickListener, TextWatcher, AttendeeDialogView {
 
     private RecyclerView recyclerView;
     private AttendeeAdapter adapter;
-    private RealmWizard realmWizard;
-    private List<String> selectedAttendees = new ArrayList<>();
-    private List<Attendee> attendees = new ArrayList<>();
     private AttendeeSelectedListener listener;
+    private EditText searchText;
+
+    @Inject
+    AttendeeDialogPresenter presenter;
 
     public AttendeeDialogFragment() {}
 
@@ -47,18 +48,28 @@ public class AttendeeDialogFragment extends DialogFragment implements AttendeeCh
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        ConferenceApplication.get(getContext()).component().inject(this);
         View view = inflater.inflate(R.layout.attendee_dialog, container, false);
         recyclerView = (RecyclerView) view.findViewById(R.id.attendee_recycler);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        realmWizard = new RealmWizard();
-        attendees = realmWizard.getStoredContacts();
-        adapter = new AttendeeAdapter(attendees, this);
-        recyclerView.setAdapter(adapter);
         Button doneButton = (Button) view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(this);
-        EditText searchText = (EditText) view.findViewById(R.id.attendee_search_text);
+        searchText = (EditText) view.findViewById(R.id.attendee_search_text);
         searchText.addTextChangedListener(this);
         return view;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        presenter.bindView(this);
+        initializeSearchIfNotNull();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        presenter.unbindView();
     }
 
     @Override
@@ -72,20 +83,36 @@ public class AttendeeDialogFragment extends DialogFragment implements AttendeeCh
     }
 
     @Override
-    public void onAttendeeChecked(Attendee attendee) {
-        if (attendee.isChecked()) {
-            selectedAttendees.add(attendee.getEmail());
-        } else selectedAttendees.remove(selectedAttendees.indexOf(attendee.getEmail()));
-    }
-
-    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.doneButton:
-                listener.onAttendeesSelected(selectedAttendees);
-                dismiss();
+                presenter.onClickDone();
             default:
                 break;
+        }
+    }
+
+    @Override
+    public void initializeAttendeeList(List<Attendee> attendees) {
+        adapter = new AttendeeAdapter(attendees, (AttendeeCheckedListener) presenter);
+        recyclerView.setAdapter(adapter);
+    }
+
+    @Override
+    public void updateAttendees(String search) {
+        adapter.filter(search);
+    }
+
+    @Override
+    public void dismissAndReturnSelectedAttendees(List<String> attendees) {
+        listener.onAttendeesSelected(attendees);
+        dismiss();
+    }
+
+    private void initializeSearchIfNotNull() {
+        String search = searchText.getText().toString();
+        if (search != null && search.length() > 0) {
+            presenter.onSearchTextChanged(search);
         }
     }
 
@@ -94,8 +121,7 @@ public class AttendeeDialogFragment extends DialogFragment implements AttendeeCh
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
-        final List<Attendee> filteredAttendees = filter(attendees, charSequence.toString());
-        adapter.animateTo(filteredAttendees);
+        presenter.onSearchTextChanged(charSequence.toString());
     }
 
     @Override
@@ -105,16 +131,4 @@ public class AttendeeDialogFragment extends DialogFragment implements AttendeeCh
         void onAttendeesSelected(List<String> attendees);
     }
 
-    private static List<Attendee> filter(List<Attendee> attendees, String query) {
-        final String lowerCaseQuery = query.toLowerCase();
-
-        final List<Attendee> filteredAttendees = new ArrayList<>();
-        for (Attendee attendee : attendees) {
-            final String name = attendee.getName().toLowerCase();
-            if(name.contains(lowerCaseQuery)) {
-                filteredAttendees.add(attendee);
-            }
-        }
-        return filteredAttendees;
-    }
 }

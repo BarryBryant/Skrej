@@ -31,7 +31,7 @@
             android:value="@integer/google_play_services_version" />
 
         <service
-            android:name=".calendarapi.EventService"
+            android:name=".calendarApi.EventService"
             android:exported="false" />
 
         <activity android:name=".event.CreateEventActivity"></activity>

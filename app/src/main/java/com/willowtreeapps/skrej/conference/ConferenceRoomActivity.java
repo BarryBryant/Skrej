@@ -16,10 +16,10 @@ import android.widget.TextView;
 import com.google.api.services.calendar.model.Event;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
-import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
-import com.willowtreeapps.skrej.calendarapi.CredentialWizard;
-import com.willowtreeapps.skrej.calendarapi.EventService;
-import com.willowtreeapps.skrej.model.RealmUser;
+import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogFragment;
+import com.willowtreeapps.skrej.calendarApi.CalendarLoader;
+import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
+import com.willowtreeapps.skrej.calendarApi.EventService;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import java.util.ArrayList;
