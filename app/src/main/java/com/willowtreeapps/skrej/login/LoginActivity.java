@@ -37,9 +37,9 @@ import pub.devrel.easypermissions.EasyPermissions;
 import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
 import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_PERMISSION_GET_ACCOUNTS;
 
-public class LoginActivity extends AppCompatActivity implements LoginView, 
+public class LoginActivity extends AppCompatActivity implements LoginView,
         EasyPermissions.PermissionCallbacks, View.OnClickListener,
-        LoaderManager.LoaderCallbacks<List<User>>,ContactsLoader.CredentialAuthRequestListener {
+        LoaderManager.LoaderCallbacks<List<User>>, ContactsLoader.CredentialAuthRequestListener {
 
     //Tag for logging.
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -47,16 +47,13 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
 
     private static final int room_id_key = 100;
     private static final int AUTH_REQUEST_ID = 3;
-
-    private List<Button> roomButtons = new ArrayList<>();
-    private ProgressBar progressBar;
-
     //The presenter for this view.
     @Inject
     LoginPresenter presenter;
-    
     @Inject
     CredentialWizard credentialWizard;
+    private List<Button> roomButtons = new ArrayList<>();
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

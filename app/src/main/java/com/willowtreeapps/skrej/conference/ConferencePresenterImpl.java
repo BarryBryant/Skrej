@@ -36,6 +36,9 @@ public class ConferencePresenterImpl implements ConferencePresenter {
         this.view = view;
         String date = getFormattedDate();
         view.updateDate(date);
+        if (events == null) {
+            view.disableScheduleButton();
+        }
     }
 
     @Override
@@ -52,6 +55,8 @@ public class ConferencePresenterImpl implements ConferencePresenter {
 
         //Update our view with wizard data.
         if (view != null) {
+            view.hideLoading();
+            view.enableScheduleButton();
             view.updateAvailability(myRoomStat.getRoomAvailability());
             view.updateAvailabilityTimeInfo(myRoomStat.getRoomAvailabilityTimeInfo());
         }
@@ -60,7 +65,7 @@ public class ConferencePresenterImpl implements ConferencePresenter {
     @Override
     public void onClickSchedule() {
         //Show spinner in view.
-        view.showSpinner();
+        view.showLoading();
         RoomAvailabilityStatus roomStatus = calendarWizard.parseFirstEvent(events);
         view.showEventDurationPrompt(roomStatus);
     }

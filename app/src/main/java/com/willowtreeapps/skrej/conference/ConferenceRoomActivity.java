@@ -138,12 +138,12 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     //region ConferenceView interface:
 
     @Override
-    public void showSpinner() {
+    public void showLoading() {
 
     }
 
     @Override
-    public void hideSpinner() {
+    public void hideLoading() {
 
     }
 
@@ -163,10 +163,14 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     }
 
     @Override
-    public void enableScheduleButton() {}
+    public void enableScheduleButton() {
+        useButton.setEnabled(true);
+    }
 
     @Override
-    public void disableScheduleButton() {}
+    public void disableScheduleButton() {
+        useButton.setEnabled(false);
+    }
 
     @Override
     public void loadCalendar() {
@@ -179,8 +183,8 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         int numOfBlocks = roomStatus.getAvailableBlocks();
         builder.setTitle("Set meeting duration");
         String[] types = new String[numOfBlocks];
-        for (int i = 0; i < numOfBlocks; i ++) {
-            types[i] = ((i+1) * 15) + " Minutes";
+        for (int i = 0; i < numOfBlocks; i++) {
+            types[i] = ((i + 1) * 15) + " Minutes";
             Log.d(TAG, types[i]);
         }
         builder.setItems(types, new DialogInterface.OnClickListener() {
@@ -234,16 +238,14 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
         //If we get valid ersults back...
         if (events != null) {
-
-            //log number of envents and hand data down to the presenter.
-            Log.d(TAG, "number of events:" + events.size());
             presenter.onEventsLoaded(events);
         }
 
     }
 
     @Override
-    public void onLoaderReset(Loader<List<Event>> loader) {}
+    public void onLoaderReset(Loader<List<Event>> loader) {
+    }
 
     //endregion
 

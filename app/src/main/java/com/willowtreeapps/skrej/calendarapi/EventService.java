@@ -25,11 +25,8 @@ import javax.inject.Inject;
 
 public class EventService extends IntentService {
 
-    public static final int STATUS_RUNNING = 0;
-    public static final int STATUS_FINISHED = 1;
-    public static final int STATUS_ERROR = 2;
-    private static final String PREF_ACCOUNT_NAME = "accountName";
     public static final long FIFTEEN_MINUTES = 900000;
+    private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String TAG = "EventService";
 
     @Inject

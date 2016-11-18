@@ -91,8 +91,8 @@ class ApplicationModule {
 
     @Provides
     @NonNull
-    public AttendeeDialogPresenter providesAttendeeDialogPresenter() {
-        return new AttendeeDialogPresenterImpl();
+    public AttendeeDialogPresenter providesAttendeeDialogPresenter(@NonNull RealmWizard realmWizard) {
+        return new AttendeeDialogPresenterImpl(realmWizard);
     }
 
 }

@@ -1,15 +1,26 @@
 package com.willowtreeapps.skrej.model;
 
-import java.util.ArrayList;
-import java.util.List;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 /**
  * Created by barrybryant on 11/17/16.
  */
 
-public class Attendee {
+public class Attendee implements Parcelable {
 
 
+    public static final Creator<Attendee> CREATOR = new Creator<Attendee>() {
+        @Override
+        public Attendee createFromParcel(Parcel in) {
+            return new Attendee(in);
+        }
+
+        @Override
+        public Attendee[] newArray(int size) {
+            return new Attendee[size];
+        }
+    };
     private String name;
     private String email;
     private boolean isChecked;
@@ -17,6 +28,24 @@ public class Attendee {
     public Attendee(String name, String email) {
         this.name = name;
         this.email = email;
+    }
+
+    protected Attendee(Parcel in) {
+        name = in.readString();
+        email = in.readString();
+        isChecked = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(email);
+        dest.writeByte((byte) (isChecked ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public String getName() {
@@ -33,18 +62,5 @@ public class Attendee {
 
     public void setChecked(boolean checked) {
         isChecked = checked;
-    }
-
-    public static List<Attendee> filter(List<Attendee> attendees, String query) {
-        final String lowerCaseQuery = query.toLowerCase();
-
-        final List<Attendee> filteredAttendees = new ArrayList<>();
-        for (Attendee attendee : attendees) {
-            final String name = attendee.getName().toLowerCase();
-            if(name.contains(lowerCaseQuery)) {
-                filteredAttendees.add(attendee);
-            }
-        }
-        return filteredAttendees;
     }
 }

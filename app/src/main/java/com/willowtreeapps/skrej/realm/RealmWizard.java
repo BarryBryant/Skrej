@@ -5,7 +5,6 @@ import com.willowtreeapps.skrej.model.Attendee;
 import com.willowtreeapps.skrej.model.RealmUser;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
 
 import io.realm.Realm;

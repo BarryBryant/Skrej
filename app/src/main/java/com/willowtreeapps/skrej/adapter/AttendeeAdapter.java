@@ -6,8 +6,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Filter;
-import android.widget.Filterable;
 
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.model.Attendee;
@@ -62,6 +60,20 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
         return attendees.size();
     }
 
+    public void filter(String text) {
+        attendees.clear();
+        if (text.isEmpty()) {
+            attendees.addAll(baseList);
+        } else {
+            text = text.toLowerCase();
+            for (Attendee attendee : baseList) {
+                if (attendee.getName().toLowerCase().contains(text)) {
+                    attendees.add(attendee);
+                }
+            }
+        }
+        notifyDataSetChanged();
+    }
 
     class ViewHolder extends RecyclerView.ViewHolder {
 
@@ -71,21 +83,6 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
             super(v);
             checkBox = (CheckBox) v.findViewById(R.id.checkBox);
         }
-    }
-
-    public void filter(String text) {
-        attendees.clear();
-        if(text.isEmpty()){
-            attendees.addAll(baseList);
-        } else{
-            text = text.toLowerCase();
-            for(Attendee attendee: baseList){
-                if(attendee.getName().toLowerCase().contains(text)){
-                    attendees.add(attendee);
-                }
-            }
-        }
-        notifyDataSetChanged();
     }
 
 }

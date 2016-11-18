@@ -1,7 +1,6 @@
 package com.willowtreeapps.skrej.model;
 
 import io.realm.RealmObject;
-import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.Required;
 
@@ -16,7 +15,8 @@ public class RealmUser extends RealmObject {
     @Required
     private String name;
 
-    public RealmUser() {}
+    public RealmUser() {
+    }
 
     public RealmUser(String email, String name) {
         this.email = email;

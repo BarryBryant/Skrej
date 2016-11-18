@@ -58,7 +58,6 @@ public class ContactsLoader extends EricRichardsonLoader<List<User>> {
         Log.d(TAG, users.size() + "");
         if (users != null) {
             for (User user : users) {
-                Log.d("SWEEEET****", user.getPrimaryEmail());
             }
         }
 

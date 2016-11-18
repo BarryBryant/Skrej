@@ -9,9 +9,9 @@ import java.util.List;
  */
 
 public interface ConferenceView {
-    void showSpinner();
+    void showLoading();
 
-    void hideSpinner();
+    void hideLoading();
 
     void updateAvailability(String availability);
 

@@ -18,13 +18,18 @@ public class AttendeeDialogPresenterImpl implements AttendeeDialogPresenter, Att
     private List<Attendee> attendees;
     private List<String> selectedAttendees = new ArrayList<>();
     private RealmWizard realmWizard;
-    private String searchText;
+
+    public AttendeeDialogPresenterImpl(RealmWizard realmWizard) {
+        this.realmWizard = realmWizard;
+    }
 
     @Override
     public void bindView(AttendeeDialogView view) {
         this.view = view;
-        realmWizard = new RealmWizard();
-        attendees = realmWizard.getStoredContacts();
+        if (attendees == null) {
+            realmWizard = new RealmWizard();
+            attendees = realmWizard.getStoredContacts();
+        }
         view.initializeAttendeeList(attendees);
     }
 
@@ -35,17 +40,16 @@ public class AttendeeDialogPresenterImpl implements AttendeeDialogPresenter, Att
 
     @Override
     public void onSearchTextChanged(String searchText) {
-        if(attendees != null) {
-            this.searchText = searchText;
-            if (view != null) {
-                view.updateAttendees(searchText);
-            }
+        if (attendees != null && view != null) {
+            view.updateAttendees(searchText);
         }
     }
 
     @Override
     public void onClickDone() {
-        view.dismissAndReturnSelectedAttendees(selectedAttendees);
+        if (view != null) {
+            view.dismissAndReturnSelectedAttendees(selectedAttendees);
+        }
     }
 
     @Override

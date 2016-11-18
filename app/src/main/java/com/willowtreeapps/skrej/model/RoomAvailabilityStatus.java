@@ -11,6 +11,17 @@ import java.text.SimpleDateFormat;
 
 public class RoomAvailabilityStatus implements Parcelable {
 
+    public static final Parcelable.Creator<RoomAvailabilityStatus> CREATOR =
+            new Parcelable.Creator<RoomAvailabilityStatus>() {
+
+                public RoomAvailabilityStatus createFromParcel(Parcel in) {
+                    return new RoomAvailabilityStatus(in);
+                }
+
+                public RoomAvailabilityStatus[] newArray(int size) {
+                    return new RoomAvailabilityStatus[size];
+                }
+            };
     private long eventStart;
     private long eventEnd;
     private int availableBlocks; //Number of 15 minute blocks the room is available for.
@@ -36,7 +47,8 @@ public class RoomAvailabilityStatus implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {}
+    public void writeToParcel(Parcel dest, int flags) {
+    }
 
     public String getRoomAvailability() {
         //Return "Available" or "Event title".
@@ -64,18 +76,6 @@ public class RoomAvailabilityStatus implements Parcelable {
         }
         return availability;
     }
-
-    public static final Parcelable.Creator<RoomAvailabilityStatus> CREATOR =
-            new Parcelable.Creator<RoomAvailabilityStatus>() {
-
-                public RoomAvailabilityStatus createFromParcel(Parcel in) {
-                    return new RoomAvailabilityStatus(in);
-                }
-
-                public RoomAvailabilityStatus[] newArray(int size) {
-                    return new RoomAvailabilityStatus[size];
-                }
-            };
 
     public int getAvailableBlocks() {
         return (availableBlocks > 4) ? 4 : availableBlocks;

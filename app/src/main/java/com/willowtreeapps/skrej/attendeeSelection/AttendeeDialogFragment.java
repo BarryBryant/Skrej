@@ -31,15 +31,15 @@ import javax.inject.Inject;
 
 public class AttendeeDialogFragment extends DialogFragment implements View.OnClickListener, TextWatcher, AttendeeDialogView {
 
+    @Inject
+    AttendeeDialogPresenter presenter;
     private RecyclerView recyclerView;
     private AttendeeAdapter adapter;
     private AttendeeSelectedListener listener;
     private EditText searchText;
 
-    @Inject
-    AttendeeDialogPresenter presenter;
-
-    public AttendeeDialogFragment() {}
+    public AttendeeDialogFragment() {
+    }
 
     public static AttendeeDialogFragment getInstance() {
         return new AttendeeDialogFragment();
@@ -56,6 +56,7 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
         doneButton.setOnClickListener(this);
         searchText = (EditText) view.findViewById(R.id.attendee_search_text);
         searchText.addTextChangedListener(this);
+        this.setCancelable(false);
         return view;
     }
 
@@ -111,13 +112,14 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
 
     private void initializeSearchIfNotNull() {
         String search = searchText.getText().toString();
-        if (search != null && search.length() > 0) {
+        if (search.length() > 0) {
             presenter.onSearchTextChanged(search);
         }
     }
 
     @Override
-    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {}
+    public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+    }
 
     @Override
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
@@ -125,7 +127,8 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
     }
 
     @Override
-    public void afterTextChanged(Editable editable) {}
+    public void afterTextChanged(Editable editable) {
+    }
 
     public interface AttendeeSelectedListener {
         void onAttendeesSelected(List<String> attendees);
