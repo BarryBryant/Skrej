@@ -1,10 +1,12 @@
 apply plugin: 'com.android.application'
 apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'realm-android'
+apply plugin: 'me.tatarka.retrolambda'
 
 android {
     compileSdkVersion 24
     buildToolsVersion "24.0.1"
+
     defaultConfig {
         applicationId "com.willowtreeapps.skrej"
         minSdkVersion 15
@@ -13,14 +15,21 @@ android {
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     configurations.all {
         resolutionStrategy.force 'com.google.code.findbugs:jsr305:1.3.9'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -33,25 +42,36 @@ dependencies {
 
     testCompile 'junit:junit:4.12'
 
+    //dagger
     apt 'com.google.dagger:dagger-compiler:2.7'
     compile 'com.google.dagger:dagger:2.7'
     provided 'javax.annotation:jsr250-api:1.0'
 
+    //android
     compile 'com.android.support:cardview-v7:24.2.1'
     compile "com.android.support:recyclerview-v7:24.2.1"
     compile 'com.android.support:appcompat-v7:24.2.1'
     compile 'com.google.android.gms:play-services-auth:9.8.0'
     compile 'pub.devrel:easypermissions:0.1.5'
+
+    //google API's
     compile('com.google.api-client:google-api-client-android:1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
     compile('com.google.apis:google-api-services-calendar:v3-rev220-1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-
-    compile('com.google.apis:google-api-services-admin-directory:directory_v1-rev53-1.20.0') {
+    compile('com.google.apis:google-api-services-admin-directory:directory_v1-rev71-1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-
     compile 'com.google.apis:google-api-services-people:v1-rev4-1.22.0'
+
+
+    //RXJava:
+    compile 'io.reactivex:rxjava:1.1.0'
+    compile 'io.reactivex:rxjava-async-util:0.21.0'
+    compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'com.jakewharton.rxbinding:rxbinding:0.3.0'
+    compile 'com.trello:rxlifecycle:0.4.0'
+    compile 'com.trello:rxlifecycle-components:0.4.0'
 }

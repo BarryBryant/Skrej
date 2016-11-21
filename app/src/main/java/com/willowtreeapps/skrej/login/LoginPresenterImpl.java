@@ -3,9 +3,10 @@ package com.willowtreeapps.skrej.login;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.google.api.services.admin.directory.model.User;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
-import com.willowtreeapps.skrej.realm.RealmWizard;
+import com.willowtreeapps.skrej.model.Attendee;
+import com.willowtreeapps.skrej.model.LoginRepository;
+import com.willowtreeapps.skrej.model.LoginRepositoryImpl;
 
 import java.util.List;
 
@@ -20,34 +21,34 @@ import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_GOOG
  */
 
 
-public class LoginPresenterImpl implements CredentialWizard.CredentialListener, LoginPresenter {
+public class LoginPresenterImpl implements CredentialWizard.CredentialListener,
+        LoginPresenter, LoginRepositoryImpl.LoginRepositoryListener{
 
     //Log tag.
     private static final String TAG = "Login presenter";
 
     //Class to get credentials.
     private CredentialWizard credentialWizard;
-    private RealmWizard realmWizard;
+    private LoginRepository repository;
 
-    private boolean contactsLoaded = false;
+    private boolean usersLoaded = false;
 
     //View instance.
     private LoginView view;
 
-
-    public LoginPresenterImpl(CredentialWizard credentialWizard, RealmWizard realmWizard) {
+    public LoginPresenterImpl(CredentialWizard credentialWizard, LoginRepository repository) {
         this.credentialWizard = credentialWizard;
-        this.realmWizard = realmWizard;
+        this.repository = repository;
         //Register this presenter as a listener to the credential helper.
         this.credentialWizard.registerListener(this);
     }
 
-
     @Override
     public void bindView(LoginView view) {
         this.view = view;
+        this.repository.registerListener(this);
         //Start running credential helper on bind view.
-        if (!credentialWizard.hasValidCredential() || !contactsLoaded) {
+        if (!credentialWizard.hasValidCredential() || !usersLoaded) {
             this.credentialWizard.getValidCredential();
             this.view.showLoading();
             this.view.disableRoomButtons();
@@ -59,6 +60,7 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener, 
 
     @Override
     public void unbindView() {
+        this.repository.unbindListener();
         this.view = null;
     }
 
@@ -91,15 +93,6 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener, 
         }
     }
 
-    @Override
-    public void onContactsLoaded(List<User> contacts) {
-        contactsLoaded = true;
-        view.hideLoading();
-        view.enableRoomButtons();
-        realmWizard.storeContacts(contacts);
-        Log.d(TAG, "******CONTACTSLOADED*********" + contacts.size());
-    }
-
     /**
      * We have valid credentials now and we can show the list of rooms.
      *
@@ -107,10 +100,7 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener, 
      */
     @Override
     public void onReceiveValidCredentials(GoogleAccountCredential credential) {
-        if (view != null) {
-            //Hide our waiting dialog.
-            view.onReceiveValidCredentials();
-        }
+        repository.getUsers();
     }
 
     @Override
@@ -133,7 +123,7 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener, 
     public void requestAccountPicker() {
         if (view != null) {
             view.hideLoading();
-            view.showAccountPicker();
+            view.showAccountPicker(credentialWizard.getCredential().newChooseAccountIntent());
         }
     }
 
@@ -146,4 +136,21 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener, 
     }
 
 
+    @Override
+    public void onUsersLoaded(List<Attendee> users) {
+        usersLoaded = true;
+        view.hideLoading();
+        view.enableRoomButtons();
+        Log.d(TAG, "******CONTACTSLOADED*********" + users.size());
+    }
+
+    @Override
+    public void onConferenceRoomsLoaded() {
+
+    }
+
+    @Override
+    public void onError(Throwable error) {
+
+    }
 }

@@ -1,5 +1,7 @@
 package com.willowtreeapps.skrej.login;
 
+import android.content.Intent;
+
 /**
  * Created by chrisestes on 11/9/16.
  */
@@ -16,9 +18,7 @@ public interface LoginView {
 
     void showUserPermissionsDialog();
 
-    void showAccountPicker();
-
-    void onReceiveValidCredentials();
+    void showAccountPicker(Intent intent);
 
     void disableRoomButtons();
 

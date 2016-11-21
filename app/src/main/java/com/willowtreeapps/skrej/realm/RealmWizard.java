@@ -18,13 +18,13 @@ import io.realm.RealmResults;
 public class RealmWizard {
 
 
-    public void storeContacts(List<User> users) {
+    public void storeContacts(List<Attendee> users) {
         Realm realm = Realm.getDefaultInstance();
         realm.beginTransaction();
 
-        for (User user : users) {
-            String email = user.getPrimaryEmail();
-            String name = user.getName().getFullName();
+        for (Attendee att : users) {
+            String email = att.getEmail();
+            String name = att.getName();
             if (email != null && name != null) {
                 RealmUser realmUser = new RealmUser(email, name);
                 realm.copyToRealmOrUpdate(realmUser);

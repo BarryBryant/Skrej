@@ -9,10 +9,13 @@ import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenter;
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenterImpl;
 import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
+import com.willowtreeapps.skrej.calendarApi.UserService;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
 import com.willowtreeapps.skrej.login.LoginPresenterImpl;
+import com.willowtreeapps.skrej.model.LoginRepository;
+import com.willowtreeapps.skrej.model.LoginRepositoryImpl;
 import com.willowtreeapps.skrej.realm.RealmWizard;
 
 import javax.annotation.Nonnull;
@@ -20,6 +23,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.realm.Realm;
 
 /**
  * Created by barrybryant on 11/10/16.
@@ -71,8 +75,19 @@ class ApplicationModule {
 
     @Provides
     @NonNull
-    public LoginPresenter provideLoginPresenter(@NonNull CredentialWizard credentialWizard, @NonNull RealmWizard realmWizard) {
-        return new LoginPresenterImpl(credentialWizard, realmWizard);
+    public UserService provideUserService(@NonNull CredentialWizard credentialWizard) {
+        return new UserService(credentialWizard);
+    }
+
+    @Provides
+    @NonNull
+    public LoginRepository provideLoginRepository(@NonNull UserService userService, @NonNull RealmWizard realmWizard) {
+        return new LoginRepositoryImpl(userService, realmWizard);
+    }
+    @Provides
+    @NonNull
+    public LoginPresenter provideLoginPresenter(@NonNull CredentialWizard credentialWizard, @NonNull LoginRepository repository) {
+        return new LoginPresenterImpl(credentialWizard, repository);
     }
 
 

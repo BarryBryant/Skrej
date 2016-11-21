@@ -23,7 +23,6 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.services.admin.directory.model.User;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
-import com.willowtreeapps.skrej.calendarApi.ContactsLoader;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 
@@ -38,8 +37,7 @@ import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_ACCO
 import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 public class LoginActivity extends AppCompatActivity implements LoginView,
-        EasyPermissions.PermissionCallbacks, View.OnClickListener,
-        LoaderManager.LoaderCallbacks<List<User>>, ContactsLoader.CredentialAuthRequestListener {
+        EasyPermissions.PermissionCallbacks, View.OnClickListener {
 
     //Tag for logging.
     private static final String TAG = LoginActivity.class.getSimpleName();
@@ -50,8 +48,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     //The presenter for this view.
     @Inject
     LoginPresenter presenter;
-    @Inject
-    CredentialWizard credentialWizard;
+
     private List<Button> roomButtons = new ArrayList<>();
     private ProgressBar progressBar;
 
@@ -176,13 +173,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     }
 
     @Override
-    public void showAccountPicker() {
-        startActivityForResult(credentialWizard.getCredential().newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
-    }
-
-    @Override
-    public void onReceiveValidCredentials() {
-        getLoaderManager().restartLoader(0, null, this);
+    public void showAccountPicker(Intent intent) {
+        startActivityForResult(intent, REQUEST_ACCOUNT_PICKER);
     }
 
     @Override
@@ -267,23 +259,4 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
 
     }
 
-    @Override
-    public Loader<List<User>> onCreateLoader(int i, Bundle bundle) {
-        return new ContactsLoader(this, credentialWizard.getDirectoryService(), this);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<User>> loader, List<User> contacts) {
-        presenter.onContactsLoaded(contacts);
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<User>> loader) {
-
-    }
-
-    @Override
-    public void onRequestAuth(Intent intent) {
-        startActivityForResult(intent, AUTH_REQUEST_ID);
-    }
 }
