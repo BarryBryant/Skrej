@@ -1,17 +1,17 @@
 package com.willowtreeapps.skrej.conference;
 
-import android.content.Intent;
+import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
-import com.google.api.services.calendar.model.Event;
+import java.util.List;
 
 /**
  * Created by barrybryant on 11/7/16.
  */
 
 public interface ConferenceView {
-    void showSpinner();
+    void showLoading();
 
-    void hideSpinner();
+    void hideLoading();
 
     void updateAvailability(String availability);
 
@@ -24,4 +24,11 @@ public interface ConferenceView {
     void disableScheduleButton();
 
     void loadCalendar();
+
+    void showEventDurationPrompt(RoomAvailabilityStatus roomStatus);
+
+    void showEventAttendeesPrompt();
+
+    void createEvent(int chosenNumOfBlocks, List<String> attendees);
+
 }

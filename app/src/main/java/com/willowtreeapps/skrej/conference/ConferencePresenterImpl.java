@@ -1,18 +1,10 @@
 package com.willowtreeapps.skrej.conference;
 
-import android.content.Intent;
-import android.util.Log;
-
-import com.google.api.services.calendar.Calendar;
 import com.google.api.services.calendar.model.Event;
-import com.willowtreeapps.skrej.calendarapi.CalendarLoader;
-import com.willowtreeapps.skrej.calendarapi.CalendarWizard;
-import com.willowtreeapps.skrej.calendarapi.RoomAvailabilityStatus;
-import com.willowtreeapps.skrej.util.EventTimeUtility;
+import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
+import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -21,21 +13,17 @@ import javax.inject.Inject;
  * Created by barrybryant on 11/7/16.
  */
 
-public class ConferencePresenterImpl
-
-    implements
-    ConferencePresenter
-{
+public class ConferencePresenterImpl implements ConferencePresenter {
 
     //Log tag.
     private static final String TAG = ConferencePresenterImpl.class.getSimpleName();
-
-    //Our view.
-    private ConferenceView view;
-
     //The calendar wizard.
     @Inject
     CalendarWizard calendarWizard;
+    //Our view.
+    private ConferenceView view;
+    private List<Event> events;
+    private int chosenNumOfBlocks;
 
     public ConferencePresenterImpl(CalendarWizard wizard) {
         this.calendarWizard = wizard;
@@ -48,6 +36,9 @@ public class ConferencePresenterImpl
         this.view = view;
         String date = getFormattedDate();
         view.updateDate(date);
+        if (events == null) {
+            view.disableScheduleButton();
+        }
     }
 
     @Override
@@ -57,15 +48,15 @@ public class ConferencePresenterImpl
 
     @Override
     public void onEventsLoaded(List<Event> events) {
-
         RoomAvailabilityStatus myRoomStat;
-
+        this.events = events;
         //Pass event data down to our wizard.
-        myRoomStat = calendarWizard.parseEventData(events);
+        myRoomStat = calendarWizard.parseFirstEvent(events);
 
         //Update our view with wizard data.
         if (view != null) {
-
+            view.hideLoading();
+            view.enableScheduleButton();
             view.updateAvailability(myRoomStat.getRoomAvailability());
             view.updateAvailabilityTimeInfo(myRoomStat.getRoomAvailabilityTimeInfo());
         }
@@ -73,9 +64,21 @@ public class ConferencePresenterImpl
 
     @Override
     public void onClickSchedule() {
-
         //Show spinner in view.
-        view.showSpinner();
+        view.showLoading();
+        RoomAvailabilityStatus roomStatus = calendarWizard.parseFirstEvent(events);
+        view.showEventDurationPrompt(roomStatus);
+    }
+
+    @Override
+    public void onNumOfBlocksChosen(int chosenNumOfBlocks) {
+        this.chosenNumOfBlocks = chosenNumOfBlocks;
+        view.showEventAttendeesPrompt();
+    }
+
+    @Override
+    public void onAttendeesSelected(List<String> attendees) {
+        view.createEvent(chosenNumOfBlocks, attendees);
     }
 
     //endregion

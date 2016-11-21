@@ -3,7 +3,9 @@ package com.willowtreeapps.skrej.login;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
+import android.app.LoaderManager;
 import android.content.Intent;
+import android.content.Loader;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -15,36 +17,43 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.api.services.admin.directory.model.User;
 import com.willowtreeapps.skrej.ConferenceApplication;
-import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
 import com.willowtreeapps.skrej.R;
+import com.willowtreeapps.skrej.calendarApi.ContactsLoader;
+import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
 
 import pub.devrel.easypermissions.EasyPermissions;
 
-import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_PERMISSION_GET_ACCOUNTS;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_PERMISSION_GET_ACCOUNTS;
 
-public class LoginActivity extends AppCompatActivity implements LoginView, EasyPermissions.PermissionCallbacks, View.OnClickListener {
+public class LoginActivity extends AppCompatActivity implements LoginView,
+        EasyPermissions.PermissionCallbacks, View.OnClickListener,
+        LoaderManager.LoaderCallbacks<List<User>>, ContactsLoader.CredentialAuthRequestListener {
 
     //Tag for logging.
     private static final String TAG = LoginActivity.class.getSimpleName();
 
 
     private static final int room_id_key = 100;
-
+    private static final int AUTH_REQUEST_ID = 3;
     //The presenter for this view.
     @Inject
     LoginPresenter presenter;
     @Inject
-    CredentialHelper credentialHelper;
-
+    CredentialWizard credentialWizard;
+    private List<Button> roomButtons = new ArrayList<>();
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,17 +61,25 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
         ConferenceApplication.get(this).component().inject(this);
         setContentView(R.layout.activity_login);
 
-
         TypedArray roomIcons = getResources().obtainTypedArray(R.array.room_icons);
         final String[] roomNames = getResources().getStringArray(R.array.room_names);
 
-        for(int loopX = 0; loopX < roomIcons.length(); loopX++) {
-
+        for (int loopX = 0; loopX < roomIcons.length(); loopX++) {
             Drawable roomIcon = ResourcesCompat.getDrawable(getResources(), roomIcons.getResourceId(loopX, -1), null);
             addRoomToList(roomNames[loopX], roomIcon, (room_id_key + loopX));
-
-
         }
+        roomIcons.recycle();
+
+        if (getLastCustomNonConfigurationInstance() != null) {
+            presenter = (LoginPresenter) getLastCustomNonConfigurationInstance();
+        }
+
+        progressBar = (ProgressBar) findViewById(R.id.progressBar);
+    }
+
+    @Override
+    public Object onRetainCustomNonConfigurationInstance() {
+        return presenter;
     }
 
     /**
@@ -137,12 +154,12 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
      */
     @Override
     public void showLoading() {
-        
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideLoading() {
-
+        progressBar.setVisibility(View.GONE);
     }
 
     /**
@@ -160,7 +177,26 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
 
     @Override
     public void showAccountPicker() {
-        startActivityForResult(credentialHelper.getCredential().newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+        startActivityForResult(credentialWizard.getCredential().newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+    }
+
+    @Override
+    public void onReceiveValidCredentials() {
+        getLoaderManager().restartLoader(0, null, this);
+    }
+
+    @Override
+    public void disableRoomButtons() {
+        for (Button button : roomButtons) {
+            button.setEnabled(false);
+        }
+    }
+
+    @Override
+    public void enableRoomButtons() {
+        for (Button button : roomButtons) {
+            button.setEnabled(true);
+        }
     }
 
     /**
@@ -188,6 +224,9 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
 
         //Set select callback.
         roomButton.setOnClickListener(this);
+
+        //Add button to list of buttons
+        roomButtons.add(roomButton);
 
         //Add room to list.
         roomList.addView(newRoom);
@@ -226,5 +265,25 @@ public class LoginActivity extends AppCompatActivity implements LoginView, EasyP
         startActivity(conferenceIntent);
 
 
+    }
+
+    @Override
+    public Loader<List<User>> onCreateLoader(int i, Bundle bundle) {
+        return new ContactsLoader(this, credentialWizard.getDirectoryService(), this);
+    }
+
+    @Override
+    public void onLoadFinished(Loader<List<User>> loader, List<User> contacts) {
+        presenter.onContactsLoaded(contacts);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<List<User>> loader) {
+
+    }
+
+    @Override
+    public void onRequestAuth(Intent intent) {
+        startActivityForResult(intent, AUTH_REQUEST_ID);
     }
 }

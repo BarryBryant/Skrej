@@ -3,12 +3,16 @@ package com.willowtreeapps.skrej.login;
 import android.util.Log;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
-import com.willowtreeapps.skrej.calendarapi.CredentialHelper;
+import com.google.api.services.admin.directory.model.User;
+import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
+import com.willowtreeapps.skrej.realm.RealmWizard;
+
+import java.util.List;
 
 import static android.app.Activity.RESULT_OK;
-import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_ACCOUNT_PICKER;
-import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_AUTHORIZATION;
-import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_GOOGLE_PLAY_SERVICES;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_AUTHORIZATION;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_GOOGLE_PLAY_SERVICES;
 
 
 /**
@@ -16,31 +20,41 @@ import static com.willowtreeapps.skrej.calendarapi.CredentialHelper.REQUEST_GOOG
  */
 
 
-public class LoginPresenterImpl implements CredentialHelper.CredentialListener, LoginPresenter {
+public class LoginPresenterImpl implements CredentialWizard.CredentialListener, LoginPresenter {
 
     //Log tag.
     private static final String TAG = "Login presenter";
 
     //Class to get credentials.
-    private CredentialHelper credentialHelper;
+    private CredentialWizard credentialWizard;
+    private RealmWizard realmWizard;
+
+    private boolean contactsLoaded = false;
 
     //View instance.
     private LoginView view;
 
 
-    public LoginPresenterImpl(CredentialHelper credentialHelper) {
-        this.credentialHelper = credentialHelper;
+    public LoginPresenterImpl(CredentialWizard credentialWizard, RealmWizard realmWizard) {
+        this.credentialWizard = credentialWizard;
+        this.realmWizard = realmWizard;
         //Register this presenter as a listener to the credential helper.
-        this.credentialHelper.registerListener(this);
+        this.credentialWizard.registerListener(this);
     }
 
 
     @Override
     public void bindView(LoginView view) {
         this.view = view;
-        this.view.showLoading();
         //Start running credential helper on bind view.
-        this.credentialHelper.getValidCredential();
+        if (!credentialWizard.hasValidCredential() || !contactsLoaded) {
+            this.credentialWizard.getValidCredential();
+            this.view.showLoading();
+            this.view.disableRoomButtons();
+        } else {
+            this.view.hideLoading();
+            this.view.enableRoomButtons();
+        }
     }
 
     @Override
@@ -60,21 +74,30 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
                 } else {
                     view.showLoading();
                     //retry with verified google play services
-                    credentialHelper.getValidCredential();
+                    credentialWizard.getValidCredential();
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
                 if (resultCode == RESULT_OK && name != null) {
                     //retry after selecting account
-                    credentialHelper.onAccountPicked(name);
+                    credentialWizard.onAccountPicked(name);
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == RESULT_OK) {
-                    credentialHelper.getValidCredential();
+                    credentialWizard.getValidCredential();
                 }
                 break;
         }
+    }
+
+    @Override
+    public void onContactsLoaded(List<User> contacts) {
+        contactsLoaded = true;
+        view.hideLoading();
+        view.enableRoomButtons();
+        realmWizard.storeContacts(contacts);
+        Log.d(TAG, "******CONTACTSLOADED*********" + contacts.size());
     }
 
     /**
@@ -86,21 +109,22 @@ public class LoginPresenterImpl implements CredentialHelper.CredentialListener, 
     public void onReceiveValidCredentials(GoogleAccountCredential credential) {
         if (view != null) {
             //Hide our waiting dialog.
-            view.hideLoading();
+            view.onReceiveValidCredentials();
         }
     }
 
     @Override
     public void onUserResolvablePlayServicesError(int connectionStatusCode, int requestCode) {
         if (view != null) {
-            view.hideLoading();
             view.showPlayServicesErrorDialog(connectionStatusCode, requestCode);
+            view.hideLoading();
         }
     }
 
     @Override
     public void networkUnavailable() {
         if (view != null) {
+            view.hideLoading();
             view.showErrorDialog("Network is unavailable");
         }
     }
