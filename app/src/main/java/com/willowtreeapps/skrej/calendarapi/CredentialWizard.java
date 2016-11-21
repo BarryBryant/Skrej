@@ -36,7 +36,9 @@ public class CredentialWizard {
     public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String TAG = "ConferencePresenterImpl";
-    private static final String[] SCOPES = {CalendarScopes.CALENDAR, DirectoryScopes.ADMIN_DIRECTORY_USER_READONLY};
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR,
+            DirectoryScopes.ADMIN_DIRECTORY_USER_READONLY,
+            DirectoryScopes.ADMIN_DIRECTORY_RESOURCE_CALENDAR_READONLY};
     private GoogleAccountCredential credential;
     private Context context;
     private SharedPreferences preferences;

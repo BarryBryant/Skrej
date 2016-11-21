@@ -21,6 +21,7 @@ import com.willowtreeapps.skrej.calendarApi.CalendarLoader;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.calendarApi.EventService;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
+import com.willowtreeapps.skrej.model.RoomModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -69,10 +70,10 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         //Get intent extras.
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-
+            RoomModel room = extras.getParcelable(getString(R.string.room_id_bundle_key));
             //Set room ID and room name.
-            roomName = extras.getString(getString(R.string.room_name_bundle_key));
-            roomID = extras.getString(getString(R.string.room_id_bundle_key));
+            roomName = room.getRoomName();
+            roomID = room.getRoomResourceEmail();
         }
 
         //Set main view.

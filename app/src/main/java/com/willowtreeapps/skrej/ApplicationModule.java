@@ -9,6 +9,7 @@ import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenter;
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenterImpl;
 import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
+import com.willowtreeapps.skrej.calendarApi.RoomService;
 import com.willowtreeapps.skrej.calendarApi.UserService;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
@@ -81,15 +82,21 @@ class ApplicationModule {
 
     @Provides
     @NonNull
-    public LoginRepository provideLoginRepository(@NonNull UserService userService, @NonNull RealmWizard realmWizard) {
-        return new LoginRepositoryImpl(userService, realmWizard);
+    public RoomService provideRoomService(@NonNull CredentialWizard credentialWizard) {
+        return new RoomService(credentialWizard);
     }
+
+    @Provides
+    @NonNull
+    public LoginRepository provideLoginRepository(@NonNull UserService userService, @NonNull RoomService roomService, @NonNull RealmWizard realmWizard) {
+        return new LoginRepositoryImpl(userService, roomService, realmWizard);
+    }
+
     @Provides
     @NonNull
     public LoginPresenter provideLoginPresenter(@NonNull CredentialWizard credentialWizard, @NonNull LoginRepository repository) {
         return new LoginPresenterImpl(credentialWizard, repository);
     }
-
 
     @Provides
     @Nonnull

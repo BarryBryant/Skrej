@@ -25,13 +25,10 @@ public class UserService {
     private static final String TAG = UserService.class.getSimpleName();
 
     public UserService(CredentialWizard credentials) {
-
         this.credentialWizard = credentials;
-
     }
 
     public Observable<List<Attendee>> getListObservable() {
-
         return (
                 getDirectoryObservable(500)
                         .map(users -> users.getUsers())

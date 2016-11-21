@@ -3,15 +3,15 @@ package com.willowtreeapps.skrej.login;
 import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
-import android.app.LoaderManager;
 import android.content.Intent;
-import android.content.Loader;
 import android.content.res.TypedArray;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -20,11 +20,12 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.api.services.admin.directory.model.User;
+import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
-import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
+import com.willowtreeapps.skrej.adapter.RoomAdapter;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
+import com.willowtreeapps.skrej.model.RoomModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,38 +35,31 @@ import javax.inject.Inject;
 import pub.devrel.easypermissions.EasyPermissions;
 
 import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_ACCOUNT_PICKER;
+import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_AUTHORIZATION;
 import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_PERMISSION_GET_ACCOUNTS;
 
 public class LoginActivity extends AppCompatActivity implements LoginView,
-        EasyPermissions.PermissionCallbacks, View.OnClickListener {
+        EasyPermissions.PermissionCallbacks {
 
     //Tag for logging.
     private static final String TAG = LoginActivity.class.getSimpleName();
 
-
-    private static final int room_id_key = 100;
-    private static final int AUTH_REQUEST_ID = 3;
     //The presenter for this view.
     @Inject
     LoginPresenter presenter;
 
     private List<Button> roomButtons = new ArrayList<>();
     private ProgressBar progressBar;
+    private RecyclerView recyclerView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ConferenceApplication.get(this).component().inject(this);
         setContentView(R.layout.activity_login);
-
-        TypedArray roomIcons = getResources().obtainTypedArray(R.array.room_icons);
-        final String[] roomNames = getResources().getStringArray(R.array.room_names);
-
-        for (int loopX = 0; loopX < roomIcons.length(); loopX++) {
-            Drawable roomIcon = ResourcesCompat.getDrawable(getResources(), roomIcons.getResourceId(loopX, -1), null);
-            addRoomToList(roomNames[loopX], roomIcon, (room_id_key + loopX));
-        }
-        roomIcons.recycle();
+        recyclerView = (RecyclerView) findViewById(R.id.room_list_recycler);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         if (getLastCustomNonConfigurationInstance() != null) {
             presenter = (LoginPresenter) getLastCustomNonConfigurationInstance();
@@ -118,9 +112,17 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //TODO: CATCH THIS MUFUGGER FOR WHEN WE GET THE AUTH IO ERROR FROM THE API STUFF
         super.onActivityResult(requestCode, resultCode, data);
-        String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-        presenter.onActivityResult(requestCode, resultCode, name);
+        switch (resultCode) {
+            case REQUEST_ACCOUNT_PICKER:
+                String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                presenter.onActivityResult(requestCode, resultCode, name);
+                break;
+            default:
+                break;
+        }
+
     }
 
     /**
@@ -191,38 +193,12 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
         }
     }
 
-    /**
-     * Add a selectable room to our list of rooms.
-     *
-     * @param roomName the name of the room.
-     * @param roomIcon an icon to display for the room.
-     */
-    private void addRoomToList(String roomName, Drawable roomIcon, int id) {
-
-        //Get out list layout.
-        LinearLayout roomList = (LinearLayout) findViewById(R.id.room_list_view);
-
-        //Create a room selector layout.
-        View newRoom = View.inflate(this, R.layout.room_selector, null);
-
-        //Set room icon.
-        ImageView roomIconView = (ImageView) newRoom.findViewById(R.id.room_selector_image);
-        roomIconView.setImageDrawable(roomIcon);
-
-        //Set room name.
-        Button roomButton = ((Button) newRoom.findViewById(R.id.room_selector_button));
-        roomButton.setText(roomName);
-        roomButton.setId(id);
-
-        //Set select callback.
-        roomButton.setOnClickListener(this);
-
-        //Add button to list of buttons
-        roomButtons.add(roomButton);
-
-        //Add room to list.
-        roomList.addView(newRoom);
+    @Override
+    public void addRoomButtons(List<RoomModel> rooms) {
+        RoomAdapter roomAdapter = new RoomAdapter(rooms);
+        recyclerView.setAdapter(roomAdapter);
     }
+
 
     /**
      * Callbacks for easyPermissions.
@@ -245,18 +221,9 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     }
 
     @Override
-    public void onClick(View view) {
-
-        int id_index = view.getId() - room_id_key;
-        final String[] roomIDs = getResources().getStringArray(R.array.room_ids);
-        final String[] roomNames = getResources().getStringArray(R.array.room_names);
-
-        Intent conferenceIntent = new Intent(this, ConferenceRoomActivity.class);
-        conferenceIntent.putExtra(getString(R.string.room_id_bundle_key), roomIDs[id_index]);
-        conferenceIntent.putExtra(getString(R.string.room_name_bundle_key), roomNames[id_index]);
-        startActivity(conferenceIntent);
-
-
+    public void onAuthIOException(UserRecoverableAuthIOException exception) {
+        Intent intent = exception.getIntent();
+        startActivityForResult(intent, REQUEST_AUTHORIZATION);
     }
 
 }
