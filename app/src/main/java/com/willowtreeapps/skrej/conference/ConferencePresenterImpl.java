@@ -33,7 +33,7 @@ public class ConferencePresenterImpl implements ConferencePresenter, ConferenceR
             view.disableScheduleButton();
             conferenceRepository.getEvents(roomId);
         } else if (roomId == null) {
-            throw new Error("ROOM ID DONT EXIST ?!");
+            throw new Error("ROOM ID DON'T EXIST ?!");
         } else {
             onRoomStatusLoaded(roomAvailabilityStatus);
         }
@@ -53,7 +53,6 @@ public class ConferencePresenterImpl implements ConferencePresenter, ConferenceR
     public void onClickSchedule() {
         //Show spinner in view.
         if (view != null) {
-            view.showLoading();
             view.showEventDurationPrompt(roomAvailabilityStatus);
         }
     }
@@ -84,6 +83,7 @@ public class ConferencePresenterImpl implements ConferencePresenter, ConferenceR
     @Override
     public void onRoomStatusLoaded(RoomAvailabilityStatus roomAvailabilityStatus) {
         if (view != null) {
+            view.hideLoading();
             if (roomAvailabilityStatus.getAvailableBlocks() < 1) {
                 view.disableScheduleButton();
             } else view.enableScheduleButton();

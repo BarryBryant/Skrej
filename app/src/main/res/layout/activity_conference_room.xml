@@ -21,26 +21,6 @@
         android:layout_alignParentStart="true" />
 
     <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/settingsButton"
-        android:text="Settings"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:text="November 4, 2016"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginRight="25dp"
-        android:layout_marginEnd="25dp"
-        android:id="@+id/dateText"
-        android:layout_alignTop="@+id/roomNameText"
-        android:layout_toLeftOf="@+id/settingsButton"
-        android:layout_toStartOf="@+id/settingsButton" />
-
-    <Button
         android:text="Use Now"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,4 +50,21 @@
         android:layout_below="@+id/statusText"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="November 4, 2016"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/dateText"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <ProgressBar
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/conference_loading_bar"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true" />
 </RelativeLayout>

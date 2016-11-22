@@ -7,6 +7,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.willowtreeapps.skrej.ConferenceApplication;
@@ -37,6 +38,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     private TextView availabilityTextView;
     private TextView availabilityTimeInfoTextView;
     private TextView dateTextView;
+    private ProgressBar progressBar;
 
     private String roomId;
 
@@ -75,6 +77,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         availabilityTextView = (TextView) findViewById(R.id.statusText);
         availabilityTimeInfoTextView = (TextView) findViewById(R.id.timeInfoText);
         dateTextView = (TextView) findViewById(R.id.dateText);
+        progressBar = (ProgressBar) findViewById(R.id.conference_loading_bar);
 
         presenter.setRoomId(roomId);
     }
@@ -120,12 +123,12 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
 
     @Override
     public void showLoading() {
-
+        progressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void hideLoading() {
-
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     @Override

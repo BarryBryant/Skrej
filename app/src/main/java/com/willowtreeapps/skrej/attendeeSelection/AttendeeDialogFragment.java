@@ -54,6 +54,8 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         Button doneButton = (Button) view.findViewById(R.id.doneButton);
         doneButton.setOnClickListener(this);
+        Button cancelButton = (Button) view.findViewById(R.id.cancelButton);
+        cancelButton.setOnClickListener(this);
         searchText = (EditText) view.findViewById(R.id.attendee_search_text);
         searchText.addTextChangedListener(this);
         this.setCancelable(false);
@@ -97,6 +99,10 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
         switch (view.getId()) {
             case R.id.doneButton:
                 presenter.onClickDone();
+                break;
+            case R.id.cancelButton:
+                dismiss();
+                break;
             default:
                 break;
         }
