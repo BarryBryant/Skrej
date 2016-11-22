@@ -127,17 +127,6 @@ public class CredentialWizard {
         } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
     }
 
-    public com.google.api.services.people.v1.People getPeopleService() {
-        if (hasValidCredential()) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            return new com.google.api.services.people.v1.People.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Calendar API Android Quickstart")
-                    .build();
-        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
-    }
-
     /**
      * Attempts to set the account used with the API credentials. If an account
      * name was previously saved it will use that one; otherwise an account
@@ -160,7 +149,6 @@ public class CredentialWizard {
                 listener.requestAccountPicker();
             }
         } else {
-            // Request the GET_ACCOUNTS permission via a user dialog
             listener.requestPermissions();
         }
     }

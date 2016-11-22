@@ -23,8 +23,6 @@ public interface ConferenceView {
 
     void disableScheduleButton();
 
-    void loadCalendar();
-
     void showEventDurationPrompt(RoomAvailabilityStatus roomStatus);
 
     void showEventAttendeesPrompt();

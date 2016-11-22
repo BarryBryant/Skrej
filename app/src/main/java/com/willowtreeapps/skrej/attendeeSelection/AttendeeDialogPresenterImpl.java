@@ -1,11 +1,14 @@
 package com.willowtreeapps.skrej.attendeeSelection;
 
 
+import android.os.Bundle;
+
 import com.willowtreeapps.skrej.adapter.AttendeeCheckedListener;
 import com.willowtreeapps.skrej.model.Attendee;
 import com.willowtreeapps.skrej.realm.RealmWizard;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -14,9 +17,11 @@ import java.util.List;
 
 public class AttendeeDialogPresenterImpl implements AttendeeDialogPresenter, AttendeeCheckedListener {
 
+    private static final String ATTENDEES_KEY = "ATTENDEES_BUNDLE_KEY";
+    private static final String SELECTED_ATTENDEES_KEY = "SELECTED_ATTENDEES_BUNDLE_KEY";
     private AttendeeDialogView view;
     private List<Attendee> attendees;
-    private List<String> selectedAttendees = new ArrayList<>();
+    private ArrayList<String> selectedAttendees = new ArrayList<>();
     private RealmWizard realmWizard;
 
     public AttendeeDialogPresenterImpl(RealmWizard realmWizard) {
@@ -50,6 +55,26 @@ public class AttendeeDialogPresenterImpl implements AttendeeDialogPresenter, Att
         if (view != null) {
             view.dismissAndReturnSelectedAttendees(selectedAttendees);
         }
+    }
+
+    @Override
+    public void restoreInstanceState(Bundle bundle) {
+        if (bundle.containsKey(ATTENDEES_KEY) && bundle.getParcelableArray(ATTENDEES_KEY) != null) {
+            attendees = Arrays.asList((Attendee[]) bundle.getParcelableArray(ATTENDEES_KEY));
+        }
+
+        if (bundle.containsKey(SELECTED_ATTENDEES_KEY) && bundle.getStringArrayList(SELECTED_ATTENDEES_KEY) != null) {
+            selectedAttendees = bundle.getStringArrayList(SELECTED_ATTENDEES_KEY);
+        }
+    }
+
+    @Override
+    public void saveInstanceState(Bundle bundle) {
+        Attendee[] parcelableAttendees = new Attendee[this.attendees.size()];
+        parcelableAttendees = this.attendees.toArray(parcelableAttendees);
+        bundle.putParcelableArray(ATTENDEES_KEY, parcelableAttendees);
+
+        bundle.putStringArrayList(SELECTED_ATTENDEES_KEY, selectedAttendees);
     }
 
     @Override

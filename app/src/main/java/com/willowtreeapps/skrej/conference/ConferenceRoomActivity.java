@@ -1,10 +1,8 @@
 package com.willowtreeapps.skrej.conference;
 
 import android.app.FragmentManager;
-import android.app.LoaderManager;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.Loader;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -13,12 +11,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.google.api.services.calendar.model.Event;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogFragment;
-import com.willowtreeapps.skrej.calendarApi.CalendarLoader;
-import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.calendarApi.EventService;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 import com.willowtreeapps.skrej.model.RoomModel;
@@ -29,8 +24,7 @@ import java.util.List;
 import javax.inject.Inject;
 
 public class ConferenceRoomActivity extends AppCompatActivity implements ConferenceView,
-        View.OnClickListener, LoaderManager.LoaderCallbacks<List<Event>>,
-        CalendarLoader.CalendarLoadedAuthRequestListener,
+        View.OnClickListener,
         AttendeeDialogFragment.AttendeeSelectedListener {
 
     //Log tag.
@@ -43,18 +37,13 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     @Inject
     ConferencePresenter presenter;
 
-    @Inject
-    CredentialWizard creds;
-
     //View widgets.
     private Button useButton;
     private TextView availabilityTextView;
     private TextView availabilityTimeInfoTextView;
     private TextView dateTextView;
 
-    //Name and ID of the room we're looking at handed in from the login activity.
-    private String roomName;
-    private String roomID;
+    private String roomId;
 
     //region AppCompatActivity lifecycle methods:
 
@@ -64,8 +53,8 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         ConferenceApplication.get(this).component().inject(this);
 
         //Init room name and ID.
-        roomName = "";
-        roomID = "";
+        String roomName = "";
+        roomId = "";
 
         //Get intent extras.
         Bundle extras = getIntent().getExtras();
@@ -73,7 +62,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
             RoomModel room = extras.getParcelable(getString(R.string.room_id_bundle_key));
             //Set room ID and room name.
             roomName = room.getRoomName();
-            roomID = room.getRoomResourceEmail();
+            roomId = room.getRoomResourceEmail();
         }
 
         //Set main view.
@@ -92,6 +81,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         availabilityTimeInfoTextView = (TextView) findViewById(R.id.timeInfoText);
         dateTextView = (TextView) findViewById(R.id.dateText);
 
+        presenter.setRoomId(roomId);
     }
 
     @Override
@@ -99,7 +89,6 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         Log.d(TAG, "onStart");
         super.onStart();
         presenter.bindView(this);
-        getLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
@@ -127,7 +116,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         super.onActivityResult(requestCode, resultCode, data);
         switch (resultCode) {
             case AUTH_REQUEST_ID:
-                loadCalendar();
+                presenter.bindView(this);
                 break;
             default:
                 break;
@@ -174,11 +163,6 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     }
 
     @Override
-    public void loadCalendar() {
-        getLoaderManager().restartLoader(0, null, this);
-    }
-
-    @Override
     public void showEventDurationPrompt(final RoomAvailabilityStatus roomStatus) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         int numOfBlocks = roomStatus.getAvailableBlocks();
@@ -214,48 +198,13 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         //Create an intent for the event service.
         Intent intent = new Intent(this, EventService.class);
         //Add our room ID.
-        intent.putExtra(getString(R.string.room_id_bundle_key), roomID);
+        intent.putExtra(getString(R.string.room_id_bundle_key), roomId);
         intent.putExtra(getString(R.string.num_of_blocks_intent_key), chosenNumOfBlocks);
         ArrayList<String> attendeesList = new ArrayList<>(attendees);
         intent.putStringArrayListExtra("attendeesKey", attendeesList);
         //Launch activity.
         startService(intent);
         Log.d(TAG, "Num of blocks: " + chosenNumOfBlocks + "num of attendees: " + attendees.size());
-    }
-
-    //endregion
-
-    //region LoaderManager.LoaderCallbacks interface:
-
-    @Override
-    public Loader<List<Event>> onCreateLoader(int i, Bundle bundle) {
-
-        //Return a new loader with this context, the API service from our presenter, the
-        //selected roomID, and set this as a listener for the loader.
-        return new CalendarLoader(this, creds.getCalendarService(), roomID, this);
-    }
-
-    @Override
-    public void onLoadFinished(Loader<List<Event>> loader, List<Event> events) {
-        //If we get valid ersults back...
-        if (events != null) {
-            presenter.onEventsLoaded(events);
-        }
-
-    }
-
-    @Override
-    public void onLoaderReset(Loader<List<Event>> loader) {
-    }
-
-    //endregion
-
-    //region CalendarLoader.CalendarLoadedAuthRequestListener interface:
-
-    @Override
-    public void onRequestAuth(Intent intent) {
-        //Start authorization request activity with the intent.
-        startActivityForResult(intent, AUTH_REQUEST_ID);
     }
 
     //endregion

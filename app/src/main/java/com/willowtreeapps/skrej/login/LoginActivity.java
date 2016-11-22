@@ -48,7 +48,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     @Inject
     LoginPresenter presenter;
 
-    private List<Button> roomButtons = new ArrayList<>();
     private ProgressBar progressBar;
     private RecyclerView recyclerView;
 
@@ -57,6 +56,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
         super.onCreate(savedInstanceState);
         ConferenceApplication.get(this).component().inject(this);
         setContentView(R.layout.activity_login);
+
         recyclerView = (RecyclerView) findViewById(R.id.room_list_recycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -112,7 +112,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        //TODO: CATCH THIS MUFUGGER FOR WHEN WE GET THE AUTH IO ERROR FROM THE API STUFF
         super.onActivityResult(requestCode, resultCode, data);
         switch (resultCode) {
             case REQUEST_ACCOUNT_PICKER:
@@ -177,20 +176,6 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     @Override
     public void showAccountPicker(Intent intent) {
         startActivityForResult(intent, REQUEST_ACCOUNT_PICKER);
-    }
-
-    @Override
-    public void disableRoomButtons() {
-        for (Button button : roomButtons) {
-            button.setEnabled(false);
-        }
-    }
-
-    @Override
-    public void enableRoomButtons() {
-        for (Button button : roomButtons) {
-            button.setEnabled(true);
-        }
     }
 
     @Override

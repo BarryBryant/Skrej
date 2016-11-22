@@ -42,7 +42,7 @@ public class UserService {
     }
 
     private Attendee apiUserToUserModel(User user) {
-        return (new Attendee(user.getName().getFullName(), user.getId()));
+        return (new Attendee(user.getName().getFullName(), user.getPrimaryEmail()));
     }
 
     private Observable<Users> getDirectoryObservable(int maxContacts) {

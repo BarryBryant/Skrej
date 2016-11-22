@@ -25,10 +25,6 @@ public interface LoginView {
 
     void showAccountPicker(Intent intent);
 
-    void disableRoomButtons();
-
-    void enableRoomButtons();
-
     void addRoomButtons(List<RoomModel> rooms);
 
     void onAuthIOException(UserRecoverableAuthIOException exception);

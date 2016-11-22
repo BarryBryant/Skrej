@@ -14,7 +14,7 @@ public interface ConferencePresenter {
 
     void unbindView();
 
-    void onEventsLoaded(List<Event> events);
+    void setRoomId(String roomId);
 
     void onClickSchedule();
 

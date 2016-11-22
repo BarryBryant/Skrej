@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenter;
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenterImpl;
-import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
+import com.willowtreeapps.skrej.calendarApi.CalendarEventService;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.calendarApi.RoomService;
 import com.willowtreeapps.skrej.calendarApi.UserService;
@@ -15,6 +15,8 @@ import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
 import com.willowtreeapps.skrej.login.LoginPresenterImpl;
+import com.willowtreeapps.skrej.model.ConferenceRepository;
+import com.willowtreeapps.skrej.model.ConferenceRepositoryImpl;
 import com.willowtreeapps.skrej.model.LoginRepository;
 import com.willowtreeapps.skrej.model.LoginRepositoryImpl;
 import com.willowtreeapps.skrej.realm.RealmWizard;
@@ -24,7 +26,6 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
-import io.realm.Realm;
 
 /**
  * Created by barrybryant on 11/10/16.
@@ -99,16 +100,21 @@ class ApplicationModule {
     }
 
     @Provides
-    @Nonnull
-    public CalendarWizard provideCalendarServiceWizard() {
-        return new CalendarWizard();
+    @NonNull
+    public CalendarEventService provideCalendarEventService(@NonNull CredentialWizard credentialWizard) {
+        return new CalendarEventService(credentialWizard);
     }
-
 
     @Provides
     @NonNull
-    public ConferencePresenter provideConferencePresenter(@Nonnull CalendarWizard wizard) {
-        return new ConferencePresenterImpl(wizard);
+    public ConferenceRepository provideConferenceRepository(@NonNull CalendarEventService calendarEventService) {
+        return new ConferenceRepositoryImpl(calendarEventService);
+    }
+
+    @Provides
+    @NonNull
+    public ConferencePresenter provideConferencePresenter(@Nonnull ConferenceRepository repository) {
+        return new ConferencePresenterImpl(repository);
     }
 
     @Provides

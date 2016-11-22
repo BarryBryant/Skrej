@@ -1,32 +1,30 @@
 package com.willowtreeapps.skrej.conference;
 
-import com.google.api.services.calendar.model.Event;
-import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
+import com.willowtreeapps.skrej.model.ConferenceRepository;
+import com.willowtreeapps.skrej.model.ConferenceRepositoryImpl;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import java.text.DateFormat;
 import java.util.List;
 
-import javax.inject.Inject;
-
 /**
  * Created by barrybryant on 11/7/16.
  */
 
-public class ConferencePresenterImpl implements ConferencePresenter {
+public class ConferencePresenterImpl implements ConferencePresenter, ConferenceRepositoryImpl.ConferenceRepositoryListener {
 
     //Log tag.
     private static final String TAG = ConferencePresenterImpl.class.getSimpleName();
-    //The calendar wizard.
-    @Inject
-    CalendarWizard calendarWizard;
-    //Our view.
-    private ConferenceView view;
-    private List<Event> events;
-    private int chosenNumOfBlocks;
 
-    public ConferencePresenterImpl(CalendarWizard wizard) {
-        this.calendarWizard = wizard;
+    private final ConferenceRepository conferenceRepository;
+    private ConferenceView view;
+    private RoomAvailabilityStatus roomAvailabilityStatus;
+    private int chosenNumOfBlocks;
+    private String roomId;
+
+    public ConferencePresenterImpl(ConferenceRepository conferenceRepository) {
+        this.conferenceRepository = conferenceRepository;
+        this.conferenceRepository.bindListener(this);
     }
 
     //region ConferencePresenter interface:
@@ -36,8 +34,13 @@ public class ConferencePresenterImpl implements ConferencePresenter {
         this.view = view;
         String date = getFormattedDate();
         view.updateDate(date);
-        if (events == null) {
+        if (roomAvailabilityStatus == null && roomId != null) {
             view.disableScheduleButton();
+            conferenceRepository.getEvents(roomId);
+        } else if (roomId == null) {
+            throw new Error("ROOM ID DONT EXIST ?!");
+        } else {
+            onRoomStatusLoaded(roomAvailabilityStatus);
         }
     }
 
@@ -47,38 +50,32 @@ public class ConferencePresenterImpl implements ConferencePresenter {
     }
 
     @Override
-    public void onEventsLoaded(List<Event> events) {
-        RoomAvailabilityStatus myRoomStat;
-        this.events = events;
-        //Pass event data down to our wizard.
-        myRoomStat = calendarWizard.parseFirstEvent(events);
-
-        //Update our view with wizard data.
-        if (view != null) {
-            view.hideLoading();
-            view.enableScheduleButton();
-            view.updateAvailability(myRoomStat.getRoomAvailability());
-            view.updateAvailabilityTimeInfo(myRoomStat.getRoomAvailabilityTimeInfo());
-        }
+    public void setRoomId(String roomId) {
+        this.roomId = roomId;
     }
 
     @Override
     public void onClickSchedule() {
         //Show spinner in view.
-        view.showLoading();
-        RoomAvailabilityStatus roomStatus = calendarWizard.parseFirstEvent(events);
-        view.showEventDurationPrompt(roomStatus);
+        if (view != null) {
+            view.showLoading();
+            view.showEventDurationPrompt(roomAvailabilityStatus);
+        }
     }
 
     @Override
     public void onNumOfBlocksChosen(int chosenNumOfBlocks) {
         this.chosenNumOfBlocks = chosenNumOfBlocks;
-        view.showEventAttendeesPrompt();
+        if (view != null) {
+            view.showEventAttendeesPrompt();
+        }
     }
 
     @Override
     public void onAttendeesSelected(List<String> attendees) {
-        view.createEvent(chosenNumOfBlocks, attendees);
+        if (view != null) {
+            view.createEvent(chosenNumOfBlocks, attendees);
+        }
     }
 
     //endregion
@@ -89,4 +86,20 @@ public class ConferencePresenterImpl implements ConferencePresenter {
         return formatter.format(currentTime);
     }
 
+    @Override
+    public void onRoomStatusLoaded(RoomAvailabilityStatus roomAvailabilityStatus) {
+        if (view != null) {
+            if (roomAvailabilityStatus.getAvailableBlocks() < 1 ) {
+                view.disableScheduleButton();
+            } else view.enableScheduleButton();
+            view.updateAvailabilityTimeInfo(roomAvailabilityStatus.getRoomAvailabilityTimeInfo());
+            view.updateAvailability(roomAvailabilityStatus.getRoomAvailability());
+        }
+        this.roomAvailabilityStatus = roomAvailabilityStatus;
+    }
+
+    @Override
+    public void onError(Throwable error) {
+
+    }
 }

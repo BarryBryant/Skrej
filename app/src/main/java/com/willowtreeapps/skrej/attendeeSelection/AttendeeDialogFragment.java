@@ -33,6 +33,7 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
 
     @Inject
     AttendeeDialogPresenter presenter;
+
     private RecyclerView recyclerView;
     private AttendeeAdapter adapter;
     private AttendeeSelectedListener listener;
@@ -57,6 +58,9 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
         searchText = (EditText) view.findViewById(R.id.attendee_search_text);
         searchText.addTextChangedListener(this);
         this.setCancelable(false);
+        if (savedInstanceState != null) {
+            presenter.restoreInstanceState(savedInstanceState);
+        }
         return view;
     }
 
@@ -81,6 +85,12 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
         } catch (ClassCastException e) {
             throw new ClassCastException(getActivity().toString() + " must implement onAttendeesSelected");
         }
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        presenter.saveInstanceState(outState);
     }
 
     @Override
