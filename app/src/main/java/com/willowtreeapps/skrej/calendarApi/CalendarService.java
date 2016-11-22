@@ -16,13 +16,13 @@ import rx.Observable;
  * Created by barrybryant on 11/21/16.
  */
 
-public class CalendarEventService {
+public class CalendarService {
 
     private static final int MAX_EVENTS_TO_RETURN = 50;
 
     private final CredentialWizard credentialWizard;
 
-    public CalendarEventService(CredentialWizard credentialWizard) {
+    public CalendarService(CredentialWizard credentialWizard) {
         this.credentialWizard = credentialWizard;
     }
 

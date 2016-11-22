@@ -1,6 +1,6 @@
 package com.willowtreeapps.skrej.conference;
 
-import com.willowtreeapps.skrej.calendarApi.CalendarEventService;
+import com.willowtreeapps.skrej.calendarApi.CalendarService;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import rx.android.schedulers.AndroidSchedulers;
@@ -12,16 +12,16 @@ import rx.schedulers.Schedulers;
 
 public class ConferenceRepositoryImpl implements ConferenceRepository {
 
-    private final CalendarEventService calendarEventService;
+    private final CalendarService calendarService;
     private ConferenceRepositoryListener listener;
 
-    public ConferenceRepositoryImpl(CalendarEventService calendarEventService) {
-        this.calendarEventService = calendarEventService;
+    public ConferenceRepositoryImpl(CalendarService calendarService) {
+        this.calendarService = calendarService;
     }
 
     @Override
     public void getEvents(String roomId) {
-        calendarEventService.getRoomAvailability(roomId).subscribeOn(Schedulers.io())
+        calendarService.getRoomAvailability(roomId).subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                         roomAvailabilityStatus -> onRoomStatusLoaded(roomAvailabilityStatus),

@@ -7,7 +7,7 @@ import android.support.annotation.NonNull;
 
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenter;
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenterImpl;
-import com.willowtreeapps.skrej.calendarApi.CalendarEventService;
+import com.willowtreeapps.skrej.calendarApi.CalendarService;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.calendarApi.RoomService;
 import com.willowtreeapps.skrej.calendarApi.UserService;
@@ -106,14 +106,14 @@ class ApplicationModule {
     //CONFERENCE ROOM SCREEN
     @Provides
     @NonNull
-    public CalendarEventService provideCalendarEventService(@NonNull CredentialWizard credentialWizard) {
-        return new CalendarEventService(credentialWizard);
+    public CalendarService provideCalendarEventService(@NonNull CredentialWizard credentialWizard) {
+        return new CalendarService(credentialWizard);
     }
 
     @Provides
     @NonNull
-    public ConferenceRepository provideConferenceRepository(@NonNull CalendarEventService calendarEventService) {
-        return new ConferenceRepositoryImpl(calendarEventService);
+    public ConferenceRepository provideConferenceRepository(@NonNull CalendarService calendarService) {
+        return new ConferenceRepositoryImpl(calendarService);
     }
 
     @Provides
