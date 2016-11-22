@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.model.Attendee;
@@ -43,15 +42,10 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
         holder.checkBox.setText(name);
         holder.checkBox.setOnCheckedChangeListener(null);
         holder.checkBox.setChecked(attendee.isChecked());
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                //TODO: CLEAN THIS SHIT UP LOL
-                Attendee attendee = attendees.get(holder.getAdapterPosition());
-                attendee.setChecked(b);
-                attendees.set(holder.getAdapterPosition(), attendee);
-                listener.onAttendeeChecked(attendee);
-            }
+        holder.checkBox.setOnCheckedChangeListener((compoundButton, b) -> {
+            attendee.setChecked(b);
+            attendees.set(holder.getAdapterPosition(), attendee);
+            listener.onAttendeeChecked(attendee);
         });
     }
 
@@ -73,6 +67,12 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
             }
         }
         notifyDataSetChanged();
+    }
+
+    public interface AttendeeCheckedListener {
+
+        void onAttendeeChecked(Attendee attendee);
+
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

@@ -18,7 +18,6 @@ import android.widget.EditText;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.adapter.AttendeeAdapter;
-import com.willowtreeapps.skrej.adapter.AttendeeCheckedListener;
 import com.willowtreeapps.skrej.model.Attendee;
 
 import java.util.List;
@@ -33,6 +32,7 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
 
     @Inject
     AttendeeDialogPresenter presenter;
+
     private RecyclerView recyclerView;
     private AttendeeAdapter adapter;
     private AttendeeSelectedListener listener;
@@ -57,6 +57,9 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
         searchText = (EditText) view.findViewById(R.id.attendee_search_text);
         searchText.addTextChangedListener(this);
         this.setCancelable(false);
+        if (savedInstanceState != null) {
+            presenter.restoreInstanceState(savedInstanceState);
+        }
         return view;
     }
 
@@ -84,6 +87,12 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        presenter.saveInstanceState(outState);
+    }
+
+    @Override
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.doneButton:
@@ -95,7 +104,7 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
 
     @Override
     public void initializeAttendeeList(List<Attendee> attendees) {
-        adapter = new AttendeeAdapter(attendees, (AttendeeCheckedListener) presenter);
+        adapter = new AttendeeAdapter(attendees, (AttendeeAdapter.AttendeeCheckedListener) presenter);
         recyclerView.setAdapter(adapter);
     }
 

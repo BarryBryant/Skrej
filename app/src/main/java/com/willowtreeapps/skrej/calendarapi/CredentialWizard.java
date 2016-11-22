@@ -36,7 +36,9 @@ public class CredentialWizard {
     public static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
     private static final String PREF_ACCOUNT_NAME = "accountName";
     private static final String TAG = "ConferencePresenterImpl";
-    private static final String[] SCOPES = {CalendarScopes.CALENDAR, DirectoryScopes.ADMIN_DIRECTORY_USER_READONLY};
+    private static final String[] SCOPES = {CalendarScopes.CALENDAR,
+            DirectoryScopes.ADMIN_DIRECTORY_USER_READONLY,
+            DirectoryScopes.ADMIN_DIRECTORY_RESOURCE_CALENDAR_READONLY};
     private GoogleAccountCredential credential;
     private Context context;
     private SharedPreferences preferences;
@@ -111,7 +113,7 @@ public class CredentialWizard {
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
-        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
+        } else throw new Error("Invalid Credentials");
     }
 
     public com.google.api.services.admin.directory.Directory getDirectoryService() {
@@ -122,18 +124,7 @@ public class CredentialWizard {
                     transport, jsonFactory, credential)
                     .setApplicationName("Directory API Android Quickstart")
                     .build();
-        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
-    }
-
-    public com.google.api.services.people.v1.People getPeopleService() {
-        if (hasValidCredential()) {
-            HttpTransport transport = AndroidHttp.newCompatibleTransport();
-            JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            return new com.google.api.services.people.v1.People.Builder(
-                    transport, jsonFactory, credential)
-                    .setApplicationName("Google Calendar API Android Quickstart")
-                    .build();
-        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
+        } else throw new Error("Invalid Credentials");
     }
 
     /**
@@ -158,7 +149,6 @@ public class CredentialWizard {
                 listener.requestAccountPicker();
             }
         } else {
-            // Request the GET_ACCOUNTS permission via a user dialog
             listener.requestPermissions();
         }
     }

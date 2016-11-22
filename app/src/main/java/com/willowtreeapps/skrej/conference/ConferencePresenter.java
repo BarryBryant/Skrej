@@ -1,7 +1,5 @@
 package com.willowtreeapps.skrej.conference;
 
-import com.google.api.services.calendar.model.Event;
-
 import java.util.List;
 
 /**
@@ -14,7 +12,7 @@ public interface ConferencePresenter {
 
     void unbindView();
 
-    void onEventsLoaded(List<Event> events);
+    void setRoomId(String roomId);
 
     void onClickSchedule();
 

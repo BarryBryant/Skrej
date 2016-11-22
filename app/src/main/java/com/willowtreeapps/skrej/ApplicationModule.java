@@ -7,12 +7,18 @@ import android.support.annotation.NonNull;
 
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenter;
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogPresenterImpl;
-import com.willowtreeapps.skrej.calendarApi.CalendarWizard;
+import com.willowtreeapps.skrej.calendarApi.CalendarService;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
+import com.willowtreeapps.skrej.calendarApi.RoomService;
+import com.willowtreeapps.skrej.calendarApi.UserService;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
+import com.willowtreeapps.skrej.conference.ConferenceRepository;
+import com.willowtreeapps.skrej.conference.ConferenceRepositoryImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
 import com.willowtreeapps.skrej.login.LoginPresenterImpl;
+import com.willowtreeapps.skrej.login.LoginRepository;
+import com.willowtreeapps.skrej.login.LoginRepositoryImpl;
 import com.willowtreeapps.skrej.realm.RealmWizard;
 
 import javax.annotation.Nonnull;
@@ -69,26 +75,55 @@ class ApplicationModule {
         return new RealmWizard();
     }
 
-    @Provides
-    @NonNull
-    public LoginPresenter provideLoginPresenter(@NonNull CredentialWizard credentialWizard, @NonNull RealmWizard realmWizard) {
-        return new LoginPresenterImpl(credentialWizard, realmWizard);
-    }
 
-
-    @Provides
-    @Nonnull
-    public CalendarWizard provideCalendarServiceWizard() {
-        return new CalendarWizard();
-    }
-
+    //LOGIN SCREEN
 
     @Provides
     @NonNull
-    public ConferencePresenter provideConferencePresenter(@Nonnull CalendarWizard wizard) {
-        return new ConferencePresenterImpl(wizard);
+    public UserService provideUserService(@NonNull CredentialWizard credentialWizard) {
+        return new UserService(credentialWizard);
     }
 
+    @Provides
+    @NonNull
+    public RoomService provideRoomService(@NonNull CredentialWizard credentialWizard) {
+        return new RoomService(credentialWizard);
+    }
+
+    @Provides
+    @NonNull
+    public LoginRepository provideLoginRepository(@NonNull UserService userService, @NonNull RoomService roomService, @NonNull RealmWizard realmWizard) {
+        return new LoginRepositoryImpl(userService, roomService, realmWizard);
+    }
+
+    @Provides
+    @NonNull
+    public LoginPresenter provideLoginPresenter(@NonNull CredentialWizard credentialWizard, @NonNull LoginRepository repository) {
+        return new LoginPresenterImpl(credentialWizard, repository);
+    }
+
+
+    //CONFERENCE ROOM SCREEN
+    @Provides
+    @NonNull
+    public CalendarService provideCalendarEventService(@NonNull CredentialWizard credentialWizard) {
+        return new CalendarService(credentialWizard);
+    }
+
+    @Provides
+    @NonNull
+    public ConferenceRepository provideConferenceRepository(@NonNull CalendarService calendarService) {
+        return new ConferenceRepositoryImpl(calendarService);
+    }
+
+    @Provides
+    @NonNull
+    public ConferencePresenter provideConferencePresenter(@Nonnull ConferenceRepository repository) {
+        return new ConferencePresenterImpl(repository);
+    }
+
+
+    //ATTENDEE SELECTION DIALOG
     @Provides
     @NonNull
     public AttendeeDialogPresenter providesAttendeeDialogPresenter(@NonNull RealmWizard realmWizard) {

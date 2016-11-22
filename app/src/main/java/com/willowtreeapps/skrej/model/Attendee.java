@@ -21,6 +21,7 @@ public class Attendee implements Parcelable {
             return new Attendee[size];
         }
     };
+
     private String name;
     private String email;
     private boolean isChecked;
