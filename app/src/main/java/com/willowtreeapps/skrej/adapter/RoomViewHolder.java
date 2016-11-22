@@ -8,7 +8,7 @@ import android.widget.Button;
 
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
-import com.willowtreeapps.skrej.model.RoomModel;
+import com.willowtreeapps.skrej.model.Room;
 
 /**
  * Created by barrybryant on 11/21/16.
@@ -24,11 +24,11 @@ public class RoomViewHolder extends RecyclerView.ViewHolder {
         roomButton = (Button) view.findViewById(R.id.room_selector_button);
     }
 
-    public void bindData(RoomModel roomModel) {
-        roomButton.setText(roomModel.getRoomName());
+    public void bindData(Room room) {
+        roomButton.setText(room.getRoomName());
         roomButton.setOnClickListener((View v) -> {
             Intent intent = new Intent(context, ConferenceRoomActivity.class);
-            intent.putExtra(context.getString(R.string.room_id_bundle_key), roomModel);
+            intent.putExtra(context.getString(R.string.room_id_bundle_key), room);
             context.startActivity(intent);
         });
     }

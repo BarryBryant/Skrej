@@ -1,7 +1,5 @@
 package com.willowtreeapps.skrej.conference;
 
-import com.google.api.services.calendar.model.Event;
-
 import java.util.List;
 
 /**

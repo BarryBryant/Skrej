@@ -13,12 +13,12 @@ import com.willowtreeapps.skrej.calendarApi.RoomService;
 import com.willowtreeapps.skrej.calendarApi.UserService;
 import com.willowtreeapps.skrej.conference.ConferencePresenter;
 import com.willowtreeapps.skrej.conference.ConferencePresenterImpl;
+import com.willowtreeapps.skrej.conference.ConferenceRepository;
+import com.willowtreeapps.skrej.conference.ConferenceRepositoryImpl;
 import com.willowtreeapps.skrej.login.LoginPresenter;
 import com.willowtreeapps.skrej.login.LoginPresenterImpl;
-import com.willowtreeapps.skrej.model.ConferenceRepository;
-import com.willowtreeapps.skrej.model.ConferenceRepositoryImpl;
-import com.willowtreeapps.skrej.model.LoginRepository;
-import com.willowtreeapps.skrej.model.LoginRepositoryImpl;
+import com.willowtreeapps.skrej.login.LoginRepository;
+import com.willowtreeapps.skrej.login.LoginRepositoryImpl;
 import com.willowtreeapps.skrej.realm.RealmWizard;
 
 import javax.annotation.Nonnull;
@@ -75,6 +75,9 @@ class ApplicationModule {
         return new RealmWizard();
     }
 
+
+    //LOGIN SCREEN
+
     @Provides
     @NonNull
     public UserService provideUserService(@NonNull CredentialWizard credentialWizard) {
@@ -99,6 +102,8 @@ class ApplicationModule {
         return new LoginPresenterImpl(credentialWizard, repository);
     }
 
+
+    //CONFERENCE ROOM SCREEN
     @Provides
     @NonNull
     public CalendarEventService provideCalendarEventService(@NonNull CredentialWizard credentialWizard) {
@@ -117,6 +122,8 @@ class ApplicationModule {
         return new ConferencePresenterImpl(repository);
     }
 
+
+    //ATTENDEE SELECTION DIALOG
     @Provides
     @NonNull
     public AttendeeDialogPresenter providesAttendeeDialogPresenter(@NonNull RealmWizard realmWizard) {

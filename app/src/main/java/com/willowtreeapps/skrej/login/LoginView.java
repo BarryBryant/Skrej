@@ -3,7 +3,7 @@ package com.willowtreeapps.skrej.login;
 import android.content.Intent;
 
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
-import com.willowtreeapps.skrej.model.RoomModel;
+import com.willowtreeapps.skrej.model.Room;
 
 import java.util.List;
 
@@ -25,7 +25,7 @@ public interface LoginView {
 
     void showAccountPicker(Intent intent);
 
-    void addRoomButtons(List<RoomModel> rooms);
+    void addRoomButtons(List<Room> rooms);
 
     void onAuthIOException(UserRecoverableAuthIOException exception);
 

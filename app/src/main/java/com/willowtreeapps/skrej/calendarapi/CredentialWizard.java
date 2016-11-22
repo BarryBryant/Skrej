@@ -113,7 +113,7 @@ public class CredentialWizard {
                     transport, jsonFactory, credential)
                     .setApplicationName("Google Calendar API Android Quickstart")
                     .build();
-        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
+        } else throw new Error("Invalid Credentials");
     }
 
     public com.google.api.services.admin.directory.Directory getDirectoryService() {
@@ -124,7 +124,7 @@ public class CredentialWizard {
                     transport, jsonFactory, credential)
                     .setApplicationName("Directory API Android Quickstart")
                     .build();
-        } else throw new Error("Invalid Credentials"); //TODO: Return user to login to get creds
+        } else throw new Error("Invalid Credentials");
     }
 
     /**

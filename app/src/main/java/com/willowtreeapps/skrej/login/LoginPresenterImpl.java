@@ -6,9 +6,7 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccoun
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
 import com.willowtreeapps.skrej.calendarApi.CredentialWizard;
 import com.willowtreeapps.skrej.model.Attendee;
-import com.willowtreeapps.skrej.model.LoginRepository;
-import com.willowtreeapps.skrej.model.LoginRepositoryImpl;
-import com.willowtreeapps.skrej.model.RoomModel;
+import com.willowtreeapps.skrej.model.Room;
 
 import java.util.List;
 
@@ -24,15 +22,15 @@ import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_GOOG
 
 
 public class LoginPresenterImpl implements CredentialWizard.CredentialListener,
-        LoginPresenter, LoginRepositoryImpl.LoginRepositoryListener{
+        LoginPresenter, LoginRepositoryImpl.LoginRepositoryListener {
 
     //Log tag.
-    private static final String TAG = "Login presenter";
+    private static final String TAG = "LoginPresenterImpl";
 
     //Class to get credentials.
     private CredentialWizard credentialWizard;
     private LoginRepository repository;
-    private List<RoomModel> roomModels;
+    private List<Room> rooms;
 
     private boolean usersLoaded = false;
     private boolean roomsLoaded = false;
@@ -56,7 +54,7 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener,
             this.credentialWizard.getValidCredential();
             this.view.showLoading();
         } else {
-            this.view.addRoomButtons(roomModels);
+            this.view.addRoomButtons(rooms);
             this.view.hideLoading();
         }
 
@@ -104,7 +102,6 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener,
      */
     @Override
     public void onReceiveValidCredentials(GoogleAccountCredential credential) {
-        Log.d(TAG, "VALID CREDS RECEIVED");
         repository.getUsers();
         repository.getConferenceRooms();
     }
@@ -148,13 +145,12 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener,
         if (view != null) {
             view.hideLoading();
         }
-        Log.d(TAG, "******CONTACTSLOADED*********" + users.size());
     }
 
     @Override
-    public void onConferenceRoomsLoaded(List<RoomModel> rooms) {
+    public void onConferenceRoomsLoaded(List<Room> rooms) {
         roomsLoaded = true;
-        this.roomModels = rooms;
+        this.rooms = rooms;
         if (view != null) {
             view.hideLoading();
             view.addRoomButtons(rooms);
@@ -163,7 +159,6 @@ public class LoginPresenterImpl implements CredentialWizard.CredentialListener,
 
     @Override
     public void onError(Throwable error) {
-        Log.e(TAG, "LOAD ERROR", error);
         if (error instanceof UserRecoverableAuthIOException) {
             view.onAuthIOException((UserRecoverableAuthIOException) error);
         }

@@ -1,7 +1,5 @@
 package com.willowtreeapps.skrej.conference;
 
-import com.willowtreeapps.skrej.model.ConferenceRepository;
-import com.willowtreeapps.skrej.model.ConferenceRepositoryImpl;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import java.text.DateFormat;
@@ -12,9 +10,6 @@ import java.util.List;
  */
 
 public class ConferencePresenterImpl implements ConferencePresenter, ConferenceRepositoryImpl.ConferenceRepositoryListener {
-
-    //Log tag.
-    private static final String TAG = ConferencePresenterImpl.class.getSimpleName();
 
     private final ConferenceRepository conferenceRepository;
     private ConferenceView view;
@@ -89,7 +84,7 @@ public class ConferencePresenterImpl implements ConferencePresenter, ConferenceR
     @Override
     public void onRoomStatusLoaded(RoomAvailabilityStatus roomAvailabilityStatus) {
         if (view != null) {
-            if (roomAvailabilityStatus.getAvailableBlocks() < 1 ) {
+            if (roomAvailabilityStatus.getAvailableBlocks() < 1) {
                 view.disableScheduleButton();
             } else view.enableScheduleButton();
             view.updateAvailabilityTimeInfo(roomAvailabilityStatus.getRoomAvailabilityTimeInfo());

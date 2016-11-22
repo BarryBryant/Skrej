@@ -21,9 +21,6 @@ public class UserService {
     @Inject
     CredentialWizard credentialWizard;
 
-    //Log tag.
-    private static final String TAG = UserService.class.getSimpleName();
-
     public UserService(CredentialWizard credentials) {
         this.credentialWizard = credentials;
     }

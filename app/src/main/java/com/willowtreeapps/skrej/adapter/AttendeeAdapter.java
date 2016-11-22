@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.model.Attendee;
@@ -68,6 +67,12 @@ public class AttendeeAdapter extends RecyclerView.Adapter<AttendeeAdapter.ViewHo
             }
         }
         notifyDataSetChanged();
+    }
+
+    public interface AttendeeCheckedListener {
+
+        void onAttendeeChecked(Attendee attendee);
+
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {

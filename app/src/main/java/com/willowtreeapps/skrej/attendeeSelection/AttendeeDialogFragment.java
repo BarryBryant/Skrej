@@ -18,7 +18,6 @@ import android.widget.EditText;
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.adapter.AttendeeAdapter;
-import com.willowtreeapps.skrej.adapter.AttendeeCheckedListener;
 import com.willowtreeapps.skrej.model.Attendee;
 
 import java.util.List;
@@ -105,7 +104,7 @@ public class AttendeeDialogFragment extends DialogFragment implements View.OnCli
 
     @Override
     public void initializeAttendeeList(List<Attendee> attendees) {
-        adapter = new AttendeeAdapter(attendees, (AttendeeCheckedListener) presenter);
+        adapter = new AttendeeAdapter(attendees, (AttendeeAdapter.AttendeeCheckedListener) presenter);
         recyclerView.setAdapter(adapter);
     }
 

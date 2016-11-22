@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej.model;
+package com.willowtreeapps.skrej.conference;
 
 /**
  * Created by barrybryant on 11/21/16.

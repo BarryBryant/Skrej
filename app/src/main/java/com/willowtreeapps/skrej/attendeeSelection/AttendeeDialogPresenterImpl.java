@@ -3,7 +3,7 @@ package com.willowtreeapps.skrej.attendeeSelection;
 
 import android.os.Bundle;
 
-import com.willowtreeapps.skrej.adapter.AttendeeCheckedListener;
+import com.willowtreeapps.skrej.adapter.AttendeeAdapter;
 import com.willowtreeapps.skrej.model.Attendee;
 import com.willowtreeapps.skrej.realm.RealmWizard;
 
@@ -15,7 +15,7 @@ import java.util.List;
  * Created by barrybryant on 11/18/16.
  */
 
-public class AttendeeDialogPresenterImpl implements AttendeeDialogPresenter, AttendeeCheckedListener {
+public class AttendeeDialogPresenterImpl implements AttendeeDialogPresenter, AttendeeAdapter.AttendeeCheckedListener {
 
     private static final String ATTENDEES_KEY = "ATTENDEES_BUNDLE_KEY";
     private static final String SELECTED_ATTENDEES_KEY = "SELECTED_ATTENDEES_BUNDLE_KEY";

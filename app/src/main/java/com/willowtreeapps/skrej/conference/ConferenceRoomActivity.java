@@ -1,12 +1,10 @@
 package com.willowtreeapps.skrej.conference;
 
 import android.app.FragmentManager;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -15,8 +13,8 @@ import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogFragment;
 import com.willowtreeapps.skrej.calendarApi.EventService;
+import com.willowtreeapps.skrej.model.Room;
 import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
-import com.willowtreeapps.skrej.model.RoomModel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,9 +24,6 @@ import javax.inject.Inject;
 public class ConferenceRoomActivity extends AppCompatActivity implements ConferenceView,
         View.OnClickListener,
         AttendeeDialogFragment.AttendeeSelectedListener {
-
-    //Log tag.
-    private static final String TAG = ConferenceRoomActivity.class.getSimpleName();
 
     //Request ID for authorization activity.
     private static final int AUTH_REQUEST_ID = 3;
@@ -59,7 +54,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         //Get intent extras.
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            RoomModel room = extras.getParcelable(getString(R.string.room_id_bundle_key));
+            Room room = extras.getParcelable(getString(R.string.room_id_bundle_key));
             //Set room ID and room name.
             roomName = room.getRoomName();
             roomId = room.getRoomResourceEmail();
@@ -86,27 +81,23 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
 
     @Override
     protected void onStart() {
-        Log.d(TAG, "onStart");
         super.onStart();
         presenter.bindView(this);
     }
 
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume");
         super.onResume();
     }
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause");
         super.onPause();
         presenter.unbindView();
     }
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "onStop");
         super.onStop();
         //presenter.unbindView();
     }
@@ -170,16 +161,10 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         String[] types = new String[numOfBlocks];
         for (int i = 0; i < numOfBlocks; i++) {
             types[i] = ((i + 1) * 15) + " Minutes";
-            Log.d(TAG, types[i]);
         }
-        builder.setItems(types, new DialogInterface.OnClickListener() {
-
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                int chosenNumOfBlocks = which + 1;
-                presenter.onNumOfBlocksChosen(chosenNumOfBlocks);
-            }
-
+        builder.setItems(types, (dialog, which) -> {
+            int chosenNumOfBlocks = which + 1;
+            presenter.onNumOfBlocksChosen(chosenNumOfBlocks);
         });
 
         builder.show();
@@ -204,7 +189,6 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         intent.putStringArrayListExtra("attendeesKey", attendeesList);
         //Launch activity.
         startService(intent);
-        Log.d(TAG, "Num of blocks: " + chosenNumOfBlocks + "num of attendees: " + attendees.size());
     }
 
     //endregion

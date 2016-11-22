@@ -41,15 +41,6 @@ public class RoomAvailabilityStatus implements Parcelable {
         eventTitle = in.readString();
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-    }
-
     public String getRoomAvailability() {
         //Return "Available" or "Event title".
         if (availableBlocks > 0) {
@@ -79,5 +70,14 @@ public class RoomAvailabilityStatus implements Parcelable {
 
     public int getAvailableBlocks() {
         return (availableBlocks > 4) ? 4 : availableBlocks;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
     }
 }

@@ -1,4 +1,4 @@
-package com.willowtreeapps.skrej.model;
+package com.willowtreeapps.skrej.realm;
 
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;

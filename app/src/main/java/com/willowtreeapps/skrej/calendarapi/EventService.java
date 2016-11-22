@@ -4,7 +4,6 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.Log;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
@@ -27,7 +26,6 @@ public class EventService extends IntentService {
 
     public static final long FIFTEEN_MINUTES = 900000;
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String TAG = "EventService";
 
     @Inject
     CredentialWizard credentialWizard;
@@ -55,7 +53,6 @@ public class EventService extends IntentService {
             createEvent(roomId, numOfBlocks, attendees);
         } catch (Exception e) {
             //send error message
-            Log.d(TAG, e.getMessage());
         }
     }
 
@@ -81,6 +78,5 @@ public class EventService extends IntentService {
             throw new Error("Account is fucked");
         }
         service.events().insert(accountId, event).execute();
-        Log.d(TAG, "GOT TO END OF THE CREATE VENT DAG");
     }
 }

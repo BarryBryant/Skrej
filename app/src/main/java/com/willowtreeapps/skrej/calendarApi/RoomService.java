@@ -1,7 +1,7 @@
 package com.willowtreeapps.skrej.calendarApi;
 
 import com.google.api.services.admin.directory.model.CalendarResources;
-import com.willowtreeapps.skrej.model.RoomModel;
+import com.willowtreeapps.skrej.model.Room;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ public class RoomService {
         this.credentialWizard = credentialWizard;
     }
 
-    public Observable<List<RoomModel>> getConferenceRoomsObservable() {
+    public Observable<List<Room>> getConferenceRoomsObservable() {
         //The Observable to return.
-        Observable<List<RoomModel>> retVal;
+        Observable<List<Room>> retVal;
 
         //Create an observable from a call to our credential helper to get all bookable resources
         //from the directory service.
@@ -44,16 +44,16 @@ public class RoomService {
                 //We are only interested in conference room calendars.
                 .filter(room -> room.getResourceType().equals("Conference Room"))
 
-                //Create RoomModel object from room calendar's resource name and ID.
-                .map(roomCalendar -> new RoomModel(roomCalendar.getResourceName(), roomCalendar.getResourceEmail()))
+                //Create Room object from room calendar's resource name and ID.
+                .map(roomCalendar -> new Room(roomCalendar.getResourceName(), roomCalendar.getResourceEmail()))
 
                 //Collect all rooms into a list.
                 .collect(
-                        () -> new ArrayList<RoomModel>(),
+                        () -> new ArrayList<Room>(),
                         (list, contact) -> list.add(contact));
 
         //Return our observable.
-        return(retVal);
+        return (retVal);
     }
 
     private Observable<CalendarResources> getCalendarObservable() {
@@ -62,10 +62,10 @@ public class RoomService {
 
     private CalendarResources getCalendarResourcesDirectory() throws IOException {
         return credentialWizard
-                        .getDirectoryService()
-                        .resources()
-                        .calendars()
-                        .list("my_customer")
-                        .execute();
+                .getDirectoryService()
+                .resources()
+                .calendars()
+                .list("my_customer")
+                .execute();
     }
 }

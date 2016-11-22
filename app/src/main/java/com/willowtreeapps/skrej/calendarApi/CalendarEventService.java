@@ -18,7 +18,6 @@ import rx.Observable;
 
 public class CalendarEventService {
 
-    private static final String TAG = "CalendarEventService";
     private static final int MAX_EVENTS_TO_RETURN = 50;
 
     private final CredentialWizard credentialWizard;
@@ -27,15 +26,34 @@ public class CalendarEventService {
         this.credentialWizard = credentialWizard;
     }
 
-    /** ============================================================================================
-     *
+    private static RoomAvailabilityStatus parseFirstEvent(List<Event> events) {
+        long currentTime = System.currentTimeMillis();
+        if (events.size() == 0) {
+            long oneHour = currentTime + DateUtils.HOUR_IN_MILLIS * 12;
+            long twoHours = oneHour + DateUtils.HOUR_IN_MILLIS;
+            return new RoomAvailabilityStatus(oneHour, twoHours, 49, "");
+        }
+        Event currentEvent = events.get(0);
+        long eventStart = currentEvent.getStart().getDateTime().getValue();
+        long eventEnd = currentEvent.getEnd().getDateTime().getValue();
+        String eventTitle = currentEvent.getSummary();
+        int freeBlocks = (int) ((eventStart - currentTime) / (15 * DateUtils.MINUTE_IN_MILLIS));
+        return new RoomAvailabilityStatus(eventStart, eventEnd, freeBlocks, eventTitle);
+    }
+
+    //region Private methods:
+
+    /**
+     * ============================================================================================
+     * <p>
      * Get an Observable that will emit a RoomAvailabilityStatus for the given room. The status
      * will be valid from the current time until midnight.
      *
      * @param calendarResourceEmail The room to get events for.
      * @return An observable that will emit the room availability status upon subscription.
-     *
-     * ------------------------------------------------------------------------------------------ */
+     * <p>
+     * ------------------------------------------------------------------------------------------
+     */
     public Observable<RoomAvailabilityStatus> getRoomAvailability(String calendarResourceEmail) {
 
         //Current time in ms.
@@ -54,7 +72,7 @@ public class CalendarEventService {
         DateTime nowTime = new DateTime(nowTimeMillis);
         DateTime midnightTime = new DateTime(midnightTimeMillis);
 
-        return(
+        return (
                 //Get raw events list Observable.
                 getEventsObservable(calendarResourceEmail, nowTime, midnightTime, MAX_EVENTS_TO_RETURN)
 
@@ -66,42 +84,42 @@ public class CalendarEventService {
         );
     }
 
-    //region Private methods:
-
-    /** ============================================================================================
-     *
+    /**
+     * ============================================================================================
+     * <p>
      * Create an Observable to get a list of events for a room.
      *
      * @param calendarResourceEmail The room to get events for.
-     * @param startTime Start time for events.
-     * @param endTime End time for events.
-     * @param maxResults Max number of events to get.
+     * @param startTime             Start time for events.
+     * @param endTime               End time for events.
+     * @param maxResults            Max number of events to get.
      * @return An Observable that will emit a list of events for the given room.
-     *
-     * ------------------------------------------------------------------------------------------ */
+     * <p>
+     * ------------------------------------------------------------------------------------------
+     */
     private Observable<Events> getEventsObservable(
             String calendarResourceEmail,
             DateTime startTime,
             DateTime endTime,
             int maxResults
     ) {
-        return(Observable.fromCallable(() ->
-                getRoomEvents(calendarResourceEmail, startTime, endTime,  maxResults)
+        return (Observable.fromCallable(() ->
+                getRoomEvents(calendarResourceEmail, startTime, endTime, maxResults)
         ));
     }
 
-    /** ============================================================================================
-     *
+    /**
+     * ============================================================================================
+     * <p>
      * Get an Events list object from the API.
      *
      * @param calendarResourceEmail The room to get events for.
-     * @param startTime Start time for events.
-     * @param endTime End time for events.
-     * @param maxResults Max number of events to get.
+     * @param startTime             Start time for events.
+     * @param endTime               End time for events.
+     * @param maxResults            Max number of events to get.
      * @return Events object containing all events between the start and end times.
-     * @throws IOException
-     *
-     * ------------------------------------------------------------------------------------------ */
+     * @throws IOException ------------------------------------------------------------------------------------------
+     */
     private Events getRoomEvents(
             String calendarResourceEmail,
             DateTime startTime,
@@ -109,7 +127,7 @@ public class CalendarEventService {
             int maxResults
     ) throws IOException {
 
-        return(
+        return (
                 credentialWizard
                         .getCalendarService()
                         .events()
@@ -121,22 +139,6 @@ public class CalendarEventService {
                         .setSingleEvents(true)
                         .execute()
         );
-    }
-
-
-    private static RoomAvailabilityStatus parseFirstEvent(List<Event> events) {
-        long currentTime = System.currentTimeMillis();
-        if (events.size() == 0) {
-            long oneHour = currentTime + DateUtils.HOUR_IN_MILLIS * 12;
-            long twoHours = oneHour + DateUtils.HOUR_IN_MILLIS;
-            return new RoomAvailabilityStatus(oneHour, twoHours, 49, "");
-        }
-        Event currentEvent = events.get(0);
-        long eventStart = currentEvent.getStart().getDateTime().getValue();
-        long eventEnd = currentEvent.getEnd().getDateTime().getValue();
-        String eventTitle = currentEvent.getSummary();
-        int freeBlocks = (int) ((eventStart - currentTime) / (15 * DateUtils.MINUTE_IN_MILLIS));
-        return new RoomAvailabilityStatus(eventStart, eventEnd, freeBlocks, eventTitle);
     }
 
 }

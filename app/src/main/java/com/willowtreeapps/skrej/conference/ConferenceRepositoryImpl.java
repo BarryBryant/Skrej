@@ -1,6 +1,7 @@
-package com.willowtreeapps.skrej.model;
+package com.willowtreeapps.skrej.conference;
 
 import com.willowtreeapps.skrej.calendarApi.CalendarEventService;
+import com.willowtreeapps.skrej.model.RoomAvailabilityStatus;
 
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -13,8 +14,6 @@ public class ConferenceRepositoryImpl implements ConferenceRepository {
 
     private final CalendarEventService calendarEventService;
     private ConferenceRepositoryListener listener;
-
-    private static final String TAG = "ConferenceRepositoryImp";
 
     public ConferenceRepositoryImpl(CalendarEventService calendarEventService) {
         this.calendarEventService = calendarEventService;

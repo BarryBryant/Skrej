@@ -1,8 +1,6 @@
 package com.willowtreeapps.skrej.realm;
 
-import com.google.api.services.admin.directory.model.User;
 import com.willowtreeapps.skrej.model.Attendee;
-import com.willowtreeapps.skrej.model.RealmUser;
 
 import java.util.ArrayList;
 import java.util.List;

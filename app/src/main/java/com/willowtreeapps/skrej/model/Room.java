@@ -4,24 +4,32 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import java.util.Comparator;
-
 /**
  * Created by barrybryant on 11/21/16.
  */
 
-public class RoomModel implements Parcelable, Comparable<RoomModel> {
+public class Room implements Parcelable, Comparable<Room> {
 
+    public static final Creator<Room> CREATOR = new Creator<Room>() {
+        @Override
+        public Room createFromParcel(Parcel in) {
+            return new Room(in);
+        }
+
+        @Override
+        public Room[] newArray(int size) {
+            return new Room[size];
+        }
+    };
     private String roomName;
     private String roomResourceEmail;
 
-
-    public RoomModel(String roomName, String roomResourceEmail) {
+    public Room(String roomName, String roomResourceEmail) {
         this.roomName = roomName;
         this.roomResourceEmail = roomResourceEmail;
     }
 
-    protected RoomModel(Parcel in) {
+    protected Room(Parcel in) {
         roomName = in.readString();
         roomResourceEmail = in.readString();
     }
@@ -37,18 +45,6 @@ public class RoomModel implements Parcelable, Comparable<RoomModel> {
         return 0;
     }
 
-    public static final Creator<RoomModel> CREATOR = new Creator<RoomModel>() {
-        @Override
-        public RoomModel createFromParcel(Parcel in) {
-            return new RoomModel(in);
-        }
-
-        @Override
-        public RoomModel[] newArray(int size) {
-            return new RoomModel[size];
-        }
-    };
-
     public String getRoomResourceEmail() {
         return roomResourceEmail;
     }
@@ -58,7 +54,7 @@ public class RoomModel implements Parcelable, Comparable<RoomModel> {
     }
 
     @Override
-    public int compareTo(@NonNull RoomModel roomModel) {
-        return this.roomName.compareTo(roomModel.getRoomName());
+    public int compareTo(@NonNull Room room) {
+        return this.roomName.compareTo(room.getRoomName());
     }
 }

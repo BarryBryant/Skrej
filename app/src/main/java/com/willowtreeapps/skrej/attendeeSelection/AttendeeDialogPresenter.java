@@ -2,10 +2,6 @@ package com.willowtreeapps.skrej.attendeeSelection;
 
 import android.os.Bundle;
 
-import com.willowtreeapps.skrej.model.Attendee;
-
-import java.util.List;
-
 /**
  * Created by barrybryant on 11/18/16.
  */

@@ -4,19 +4,12 @@ import android.Manifest;
 import android.accounts.AccountManager;
 import android.app.Dialog;
 import android.content.Intent;
-import android.content.res.TypedArray;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -24,10 +17,8 @@ import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecovera
 import com.willowtreeapps.skrej.ConferenceApplication;
 import com.willowtreeapps.skrej.R;
 import com.willowtreeapps.skrej.adapter.RoomAdapter;
-import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
-import com.willowtreeapps.skrej.model.RoomModel;
+import com.willowtreeapps.skrej.model.Room;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -40,9 +31,6 @@ import static com.willowtreeapps.skrej.calendarApi.CredentialWizard.REQUEST_PERM
 
 public class LoginActivity extends AppCompatActivity implements LoginView,
         EasyPermissions.PermissionCallbacks {
-
-    //Tag for logging.
-    private static final String TAG = LoginActivity.class.getSimpleName();
 
     //The presenter for this view.
     @Inject
@@ -78,27 +66,23 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
      */
     @Override
     protected void onResume() {
-        Log.d(TAG, "onResume");
         super.onResume();
         presenter.bindView(this);
     }
 
     @Override
     protected void onPause() {
-        Log.d(TAG, "onPause");
         super.onPause();
         presenter.unbindView();
     }
 
     @Override
     protected void onStart() {
-        Log.d(TAG, "onStart");
         super.onStart();
     }
 
     @Override
     protected void onStop() {
-        Log.d(TAG, "onStop");
         super.onStop();
     }
 
@@ -179,7 +163,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     }
 
     @Override
-    public void addRoomButtons(List<RoomModel> rooms) {
+    public void addRoomButtons(List<Room> rooms) {
         RoomAdapter roomAdapter = new RoomAdapter(rooms);
         recyclerView.setAdapter(roomAdapter);
     }
