@@ -97,7 +97,7 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode) {
+        switch (requestCode) {
             case REQUEST_ACCOUNT_PICKER:
                 String name = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                 presenter.onActivityResult(requestCode, resultCode, name);
