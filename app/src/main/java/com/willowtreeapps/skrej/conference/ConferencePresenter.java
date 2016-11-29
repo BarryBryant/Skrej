@@ -19,4 +19,6 @@ public interface ConferencePresenter {
     void onNumOfBlocksChosen(int chosenNumOfBlocks);
 
     void onAttendeesSelected(List<String> attendees);
+
+    void refreshEvents();
 }

@@ -10,6 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="50dp"
         android:id="@+id/room_selector_button"
-        android:padding="8dp"/>
+        android:padding="8dp"
+        style="@style/Widget.AppCompat.Button.Borderless" />
 
 </FrameLayout>

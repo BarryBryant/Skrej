@@ -7,10 +7,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
@@ -48,6 +52,9 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
         recyclerView = (RecyclerView) findViewById(R.id.room_list_recycler);
         recyclerView.setHasFixedSize(true);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerView.getContext(),
+                DividerItemDecoration.VERTICAL);
+        recyclerView.addItemDecoration(dividerItemDecoration);
 
         if (getLastCustomNonConfigurationInstance() != null) {
             presenter = (LoginPresenter) getLastCustomNonConfigurationInstance();
@@ -55,6 +62,8 @@ public class LoginActivity extends AppCompatActivity implements LoginView,
 
         progressBar = (ProgressBar) findViewById(R.id.progressBar);
     }
+
+
 
     @Override
     public Object onRetainCustomNonConfigurationInstance() {

@@ -5,4 +5,5 @@
     <string name="room_name_bundle_key">ROOM_NAME</string>
     <string name="room_status_intent_key">roomStatusKey</string>
     <string name="num_of_blocks_intent_key">numOfBlocksKey</string>
+    <string name="title_activity_throwaway">throwaway</string>
 </resources>

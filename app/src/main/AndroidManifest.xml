@@ -34,7 +34,7 @@
             android:name=".calendarApi.EventService"
             android:exported="false" />
 
-        <activity android:name=".event.CreateEventActivity"></activity>
+        <activity android:name=".event.CreateEventActivity" />
     </application>
 
 </manifest>

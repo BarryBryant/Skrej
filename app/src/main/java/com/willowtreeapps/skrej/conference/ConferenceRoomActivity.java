@@ -1,8 +1,13 @@
 package com.willowtreeapps.skrej.conference;
 
 import android.app.FragmentManager;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -22,6 +27,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import static com.willowtreeapps.skrej.calendarApi.EventService.EVENT_INTENT_ID;
+
 public class ConferenceRoomActivity extends AppCompatActivity implements ConferenceView,
         View.OnClickListener,
         AttendeeDialogFragment.AttendeeSelectedListener {
@@ -34,13 +41,19 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     ConferencePresenter presenter;
 
     //View widgets.
-    private Button useButton;
+    private FloatingActionButton useButton;
     private TextView availabilityTextView;
     private TextView availabilityTimeInfoTextView;
     private TextView dateTextView;
     private ProgressBar progressBar;
-
     private String roomId;
+
+    private BroadcastReceiver eventReceiever = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            presenter.refreshEvents();
+        }
+    };
 
     //region AppCompatActivity lifecycle methods:
 
@@ -66,7 +79,7 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         setContentView(R.layout.activity_conference_room);
 
         //Set click listener for 'Use' button.
-        useButton = (Button) findViewById(R.id.useRoomButton);
+        useButton = (FloatingActionButton) findViewById(R.id.useRoomButton);
         useButton.setOnClickListener(this);
 
         //Set room name text.
@@ -80,6 +93,9 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
         progressBar = (ProgressBar) findViewById(R.id.conference_loading_bar);
 
         presenter.setRoomId(roomId);
+
+        LocalBroadcastManager.getInstance(this).registerReceiver(eventReceiever,
+                new IntentFilter(EVENT_INTENT_ID));
     }
 
     @Override
@@ -103,6 +119,12 @@ public class ConferenceRoomActivity extends AppCompatActivity implements Confere
     protected void onStop() {
         super.onStop();
         //presenter.unbindView();
+    }
+
+    @Override
+    protected void onDestroy() {
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(eventReceiever);
+        super.onDestroy();
     }
 
     @Override

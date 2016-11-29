@@ -4,6 +4,8 @@ import android.app.IntentService;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 
 import com.google.api.client.util.DateTime;
 import com.google.api.services.calendar.model.Event;
@@ -25,6 +27,7 @@ import javax.inject.Inject;
 public class EventService extends IntentService {
 
     public static final long FIFTEEN_MINUTES = 900000;
+    public static final String EVENT_INTENT_ID = "NEW_EVENT";
     private static final String PREF_ACCOUNT_NAME = "accountName";
 
     @Inject
@@ -78,5 +81,7 @@ public class EventService extends IntentService {
             throw new Error("Account is fucked");
         }
         service.events().insert(accountId, event).execute();
+        Intent intent = new Intent(EVENT_INTENT_ID);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
     }
 }

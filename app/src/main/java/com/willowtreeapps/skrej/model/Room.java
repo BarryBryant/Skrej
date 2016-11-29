@@ -10,6 +10,22 @@ import android.support.annotation.NonNull;
 
 public class Room implements Parcelable, Comparable<Room> {
 
+    private String roomName;
+    private String roomResourceEmail;
+
+    public Room(String roomName, String roomResourceEmail) {
+        this.roomName = roomName;
+        this.roomResourceEmail = roomResourceEmail;
+    }
+
+    public String getRoomResourceEmail() {
+        return roomResourceEmail;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
     public static final Creator<Room> CREATOR = new Creator<Room>() {
         @Override
         public Room createFromParcel(Parcel in) {
@@ -21,13 +37,6 @@ public class Room implements Parcelable, Comparable<Room> {
             return new Room[size];
         }
     };
-    private String roomName;
-    private String roomResourceEmail;
-
-    public Room(String roomName, String roomResourceEmail) {
-        this.roomName = roomName;
-        this.roomResourceEmail = roomResourceEmail;
-    }
 
     protected Room(Parcel in) {
         roomName = in.readString();
@@ -41,16 +50,13 @@ public class Room implements Parcelable, Comparable<Room> {
     }
 
     @Override
+    public String toString() {
+        return roomName;
+    }
+
+    @Override
     public int describeContents() {
         return 0;
-    }
-
-    public String getRoomResourceEmail() {
-        return roomResourceEmail;
-    }
-
-    public String getRoomName() {
-        return roomName;
     }
 
     @Override

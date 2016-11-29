@@ -42,6 +42,7 @@ public class ConferencePresenterImpl implements ConferencePresenter, ConferenceR
     @Override
     public void unbindView() {
         this.view = null;
+        conferenceRepository.unbindListener();
     }
 
     @Override
@@ -70,6 +71,11 @@ public class ConferencePresenterImpl implements ConferencePresenter, ConferenceR
         if (view != null) {
             view.createEvent(chosenNumOfBlocks, attendees);
         }
+    }
+
+    @Override
+    public void refreshEvents() {
+        conferenceRepository.getEvents(roomId);
     }
 
     //endregion

@@ -4,13 +4,13 @@ apply plugin: 'realm-android'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion "24.0.1"
 
     defaultConfig {
         applicationId "com.willowtreeapps.skrej"
         minSdkVersion 15
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -48,11 +48,13 @@ dependencies {
     provided 'javax.annotation:jsr250-api:1.0'
 
     //android
-    compile 'com.android.support:cardview-v7:24.2.1'
-    compile "com.android.support:recyclerview-v7:24.2.1"
-    compile 'com.android.support:appcompat-v7:24.2.1'
-    compile 'com.google.android.gms:play-services-auth:9.8.0'
+    compile 'com.android.support:cardview-v7:25.0.1'
+    compile "com.android.support:recyclerview-v7:25.0.1"
+    compile 'com.android.support:appcompat-v7:25.0.1'
+    compile 'com.google.android.gms:play-services-auth:10.0.0'
     compile 'pub.devrel:easypermissions:0.1.5'
+    compile 'com.android.support.constraint:constraint-layout:1.0.0-beta4'
+    compile 'com.android.support:design:25.0.1'
 
     //google API's
     compile('com.google.api-client:google-api-client-android:1.22.0') {
