@@ -1,8 +1,13 @@
-package com.willowtreeapps.skrej;
+package com.willowtreeapps.skrej.dagger;
 
 import com.willowtreeapps.skrej.attendeeSelection.AttendeeDialogFragment;
 import com.willowtreeapps.skrej.calendarApi.EventService;
 import com.willowtreeapps.skrej.conference.ConferenceRoomActivity;
+import com.willowtreeapps.skrej.dagger.AppModule;
+import com.willowtreeapps.skrej.dagger.AttendeeSelectionFragmentModule;
+import com.willowtreeapps.skrej.dagger.ConferenceActivityModule;
+import com.willowtreeapps.skrej.dagger.LoginActivityModule;
+import com.willowtreeapps.skrej.dagger.ServicesModule;
 import com.willowtreeapps.skrej.login.LoginActivity;
 
 import javax.inject.Singleton;
@@ -14,7 +19,15 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {ApplicationModule.class})
+@Component(
+    modules = {
+        AppModule.class,
+        AttendeeSelectionFragmentModule.class,
+        ConferenceActivityModule.class,
+        LoginActivityModule.class,
+        ServicesModule.class
+    }
+)
 public interface ApplicationComponent {
     void inject(LoginActivity activity);
 

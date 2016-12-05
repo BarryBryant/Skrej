@@ -66,8 +66,6 @@ dependencies {
     compile('com.google.apis:google-api-services-admin-directory:directory_v1-rev71-1.22.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    compile 'com.google.apis:google-api-services-people:v1-rev4-1.22.0'
-
 
     //RXJava:
     compile 'io.reactivex:rxjava:1.1.0'

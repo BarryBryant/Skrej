@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
@@ -15,9 +16,17 @@ import io.realm.RealmResults;
 
 public class RealmWizard {
 
+    private RealmConfiguration configuration;
+
+    public RealmWizard() {
+        configuration = new RealmConfiguration
+            .Builder()
+            .deleteRealmIfMigrationNeeded()
+            .build();
+    }
 
     public void storeContacts(List<Attendee> users) {
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(configuration);
         realm.beginTransaction();
 
         for (Attendee att : users) {
@@ -32,7 +41,7 @@ public class RealmWizard {
     }
 
     public List<Attendee> getStoredContacts() {
-        Realm realm = Realm.getDefaultInstance();
+        Realm realm = Realm.getInstance(configuration);
         RealmQuery<RealmUser> query = realm.where(RealmUser.class);
         RealmResults<RealmUser> results = query.findAll();
         results = results.sort("name");

@@ -4,6 +4,10 @@ import android.app.Application;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.willowtreeapps.skrej.dagger.AppModule;
+import com.willowtreeapps.skrej.dagger.ApplicationComponent;
+import com.willowtreeapps.skrej.dagger.DaggerApplicationComponent;
+
 import io.realm.Realm;
 
 /**
@@ -32,7 +36,7 @@ public class ConferenceApplication extends Application {
 
     private ApplicationComponent buildComponent() {
         return DaggerApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(this))
+                .appModule(new AppModule(this))
                 .build();
     }
 
